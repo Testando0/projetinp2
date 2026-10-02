@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#0a0a0b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DEMID">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="DEMID">
+  <meta name="description" content="Departamento de Mídia e Comunicação — Sistema Central">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/logo.png">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="shortcut icon" href="/logo.png">
+
+  <title>DEMID — Sistema Central</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/extra.css">
+
+  <style>
+    /* ══ 1. FONTE PROFISSIONAL ══ */
+    *,*::before,*::after{font-family:'Inter','Roboto',system-ui,-apple-system,'Segoe UI',sans-serif !important;}
+    body::after{display:none !important;}
+    .login-mark{animation:none !important;font-weight:800 !important;letter-spacing:.06em !important;}
+    .login-mark,.topbar-logo,.stat-num,#rel-clock,#ban-timer{font-variant-numeric:tabular-nums;}
+    .login-sub,.fg label,.tbl th,.stat-lbl,.oc-meta,.hint,.oc-f label,.resp-lbl,.log-time,
+    .ban-subtitle,.ban-timer-label,.ban-info-label,.ws-status-bar,.topbar-user,.notif-pill,.empty p{letter-spacing:.06em !important;}
+    .stitle,.tab,.btn,.nav-drawer-item,.modal-h h3,.cargo-badge,.status-chip,.tipo-badge,.ban-badge,.ban-title{letter-spacing:.04em !important;}
+
+    /* ══ 2. FUNDO E SUPERFÍCIES ══ */
+    body{background:#0a0a0b !important;}
+    #s-login{background:radial-gradient(1100px 560px at 50% -10%,rgba(255,255,255,.06),transparent 60%),#0a0a0b !important;}
+    #s-ban{background:radial-gradient(900px 500px at 50% 18%,rgba(255,255,255,.08),transparent 60%),#0a0a0b !important;}
+    .topbar,.tabs{background:#0d0d0f !important;border-color:rgba(255,255,255,.15) !important;}
+    .card,.login-card,.modal,.settings-menu,.empty,.hint-box,.dep-box,
+    .ban-container,.cargo-notif,.ponto-agente-block,.toast,.tbl-wrap{
+      background:rgba(14,14,16,.92) !important;
+      border:1px solid rgba(255,255,255,.3) !important;
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    }
+    .card::before{display:none !important;}
+    .oc-wrap,.stat-box{background:rgba(18,18,22,.82) !important;border:1px solid rgba(255,255,255,.35) !important;}
+    .card,.login-card,.modal,.settings-menu,.empty,.hint-box,.dep-box,
+    .ban-container,.cargo-notif,.ponto-agente-block,.toast,.tbl-wrap,
+    .oc-wrap,.stat-box{
+      box-shadow:0 0 30px rgba(255,255,255,.10),0 0 60px rgba(255,255,255,.05),inset 0 0 20px rgba(0,0,0,.35) !important;
+    }
+    .ban-container{background:rgba(18,14,18,.92) !important;}
+
+    /* ══ 3. ARREDONDAMENTO ══ */
+    .card,.oc-wrap,.modal,.login-card,.empty,.hint-box,.dep-box,.ban-container,
+    .cargo-notif,.ponto-agente-block,.tbl-wrap,.settings-menu{border-radius:22px !important;}
+    .stat-box{border-radius:18px !important;}
+    .btn,input,select,textarea,.settings-btn,.hamburger-btn,.cargo-select{border-radius:14px !important;}
+    .btn-sm{border-radius:12px !important;}
+    .btn-xs{border-radius:10px !important;}
+    .filter-bar .btn{border-radius:999px !important;}
+    .tab{border-radius:999px !important;background:#17171a !important;}
+    .tab.active{background:#fff !important;border-color:rgba(255,255,255,.9) !important;color:#0a0a0b !important;}
+    .tabs{gap:8px !important;padding:12px 16px !important;}
+    .cargo-badge,.status-chip,.tipo-badge,.ban-badge,.notif-pill{border-radius:999px !important;padding:4px 10px !important;}
+    /* ══ CORREÇÃO: background-color em vez de background (para permitir imagem inline) ══ */
+    .u-avatar{border-radius:12px !important;background-color:rgba(255,255,255,.08) !important;border:1px solid rgba(255,255,255,.3) !important;color:#fff !important;position:relative;overflow:hidden;}
+    .nav-drawer{border-radius:0 0 22px 22px !important;}
+    .ban-timer-wrap{border-radius:18px !important;}
+    .ban-status-msg{border-radius:14px !important;}
+    .pv-alt,label.pv-alt{border-radius:14px !important;}
+    .pass-strength,.ps-bar,::-webkit-scrollbar-thumb{border-radius:999px !important;}
+    div[style*="border-radius:4px"],div[style*="border-radius: 4px"]{border-radius:16px !important;}
+    div[style*="border-radius:3px"],div[style*="border-radius: 3px"]{border-radius:12px !important;}
+
+    /* ══ 4. TIPOGRAFIA / COMPONENTES ══ */
+    .btn{text-transform:none !important;font-weight:600 !important;}
+    .tab{text-transform:none !important;font-weight:600 !important;font-size:.74rem !important;padding:9px 16px !important;}
+    .stitle{text-transform:uppercase !important;font-weight:700 !important;color:#e5e7eb !important;font-size:.78rem !important;}
+    .fg label,.oc-f label,.tbl th{text-transform:uppercase !important;color:#9ca3af !important;font-weight:600 !important;font-size:.68rem !important;}
+    .nav-drawer-item{font-size:.82rem !important;font-weight:600 !important;text-transform:none !important;letter-spacing:.02em !important;}
+    input,select,textarea{background:rgba(14,14,16,.82) !important;border:1px solid rgba(255,255,255,.35) !important;font-weight:500 !important;}
+    input:focus,select:focus,textarea:focus{border-color:rgba(255,255,255,.7) !important;box-shadow:0 0 0 3px rgba(255,255,255,.12) !important;}
+    select option{background:#17171a !important;}
+    .btn-primary{background:#fff !important;color:#0a0a0b !important;font-weight:700 !important;}
+    .btn-ghost{background:transparent !important;}
+    .settings-btn,.hamburger-btn{background:rgba(14,14,16,.82) !important;border:1px solid rgba(255,255,255,.35) !important;}
+    .tbl th{background:rgba(255,255,255,.03) !important;}
+    .tbl td,.tbl th,.log-entry{border-color:rgba(255,255,255,.08) !important;}
+    .settings-item{font-weight:500 !important;}
+    .topbar-logo{font-weight:800 !important;font-size:.95rem !important;}
+    .login-card h2,.modal-h h3{font-weight:700 !important;}
+    #rel-clock,.stat-num{font-weight:800 !important;}
+    .empty{border-style:dashed !important;border-color:rgba(255,255,255,.2) !important;}
+    .ws-status-bar{background:rgba(13,13,15,.92) !important;border-top:1px solid rgba(255,255,255,.15) !important;}
+    .modal-overlay{backdrop-filter:blur(8px) !important;-webkit-backdrop-filter:blur(8px) !important;}
+
+    /* ══ 5. BORDA FINA "RESPIRANDO" ══ */
+    @keyframes demid-borda-pulso{
+      0%,100%{border-color:rgba(255,255,255,.10);box-shadow:0 0 20px rgba(255,255,255,.05),0 0 0 0 rgba(255,255,255,0);}
+      50%{border-color:rgba(255,255,255,.30);box-shadow:0 0 40px rgba(255,255,255,.15),0 0 14px rgba(255,255,255,.12);}
+    }
+    @keyframes demid-borda-pulso-suave{
+      0%,100%{border-color:rgba(255,255,255,.18);}
+      50%{border-color:rgba(255,255,255,.35);}
+    }
+    @keyframes demid-glow-pulso{
+      0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
+      50%{box-shadow:0 0 16px 0 rgba(255,255,255,.18);}
+    }
+    .card,.oc-wrap,.login-card,.empty,.hint-box,.dep-box,.ponto-agente-block,
+    .stat-box,.ban-status-msg,.tbl-wrap,.modal{
+      border:1px solid rgba(255,255,255,.10) !important;
+      animation:demid-borda-pulso 4.5s ease-in-out infinite !important;
+    }
+    .modal{animation:modalIn .22s cubic-bezier(0,.6,.4,1), demid-borda-pulso 4.5s ease-in-out infinite !important;}
+    .tab:not(.active),.pv-alt,label.pv-alt,.btn-ghost,.settings-btn,.hamburger-btn{
+      border:1px solid rgba(255,255,255,.18) !important;
+      animation:demid-borda-pulso-suave 3.6s ease-in-out infinite !important;
+    }
+    input,select,textarea{
+      border:1px solid rgba(255,255,255,.18) !important;
+      animation:demid-borda-pulso-suave 5.5s ease-in-out infinite !important;
+    }
+    div[style*="border-radius:4px"],div[style*="border-radius: 4px"]{
+      animation:demid-borda-pulso-suave 4.2s ease-in-out infinite !important;
+    }
+    .decide-zone.open,.acc-item.open,.card:hover,.oc-wrap:hover,.modal:hover{
+      animation:demid-borda-aberto 2.8s ease-in-out infinite !important;
+    }
+    @keyframes demid-borda-aberto{
+      0%,100%{border-color:rgba(255,255,255,.45);box-shadow:0 0 16px rgba(255,255,255,.10);}
+      50%{border-color:rgba(255,255,255,.60);box-shadow:0 0 28px rgba(255,255,255,.20);}
+    }
+    .cargo-badge,.status-chip,.tipo-badge,.ban-badge,.notif-pill,.u-avatar,
+    .ban-container,.ban-timer-wrap,.cargo-notif{
+      animation:demid-glow-pulso 3.6s ease-in-out infinite !important;
+    }
+    .tab.active{animation:none !important;border-color:rgba(255,255,255,.9) !important;}
+    input:focus,select:focus,textarea:focus{animation:none !important;border-color:rgba(255,255,255,.7) !important;}
+    .btn-primary,.btn-success,.btn-danger,.btn-warn{animation:none !important;}
+    @media (prefers-reduced-motion: reduce){
+      .card,.oc-wrap,.login-card,.empty,.hint-box,.dep-box,.ponto-agente-block,.stat-box,
+      .ban-status-msg,.tbl-wrap,.modal,.tab:not(.active),.pv-alt,label.pv-alt,.btn-ghost,
+      .settings-btn,.hamburger-btn,input,select,textarea,div[style*="border-radius:4px"],
+      .cargo-badge,.status-chip,.tipo-badge,.ban-badge,.notif-pill,.u-avatar,
+      .ban-container,.ban-timer-wrap,.cargo-notif,.decide-zone.open{animation:none !important;}
+    }
+
+    /* ══ 6. ROLETA — CSS GLOBAL ══ */
+    .roleta-hero{position:relative;padding:28px 24px;border-radius:20px;margin-bottom:20px;background:radial-gradient(circle at 20% 30%,rgba(245,158,11,.15) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(139,92,246,.15) 0%,transparent 50%),linear-gradient(135deg,rgba(14,14,16,.95) 0%,rgba(20,20,24,.95) 100%);border:1px solid rgba(255,255,255,.15);overflow:hidden;}
+    .roleta-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);}
+    .roleta-hero-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+    .roleta-hero-title{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 50%,#dc2626 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;letter-spacing:.08em;}
+    .roleta-hero-sub{font-size:.78rem;color:var(--text-mid);letter-spacing:.04em;}
+    .roleta-master-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:.75rem;cursor:pointer;letter-spacing:.05em;box-shadow:0 4px 16px rgba(236,72,153,.4);transition:all .2s;}
+    .roleta-master-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(236,72,153,.6);}
+    .roleta-master-btn-ico{font-size:1rem;}
+    .roleta-master-banner{position:relative;padding:14px 18px;margin-bottom:18px;background:linear-gradient(135deg,rgba(167,139,250,.15) 0%,rgba(236,72,153,.1) 100%);border:1px solid rgba(167,139,250,.5);border-radius:14px;overflow:hidden;}
+    .roleta-master-glow{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(167,139,250,.3) 0%,transparent 50%);animation:roletaPulse 3s ease-in-out infinite;}
+    .roleta-master-content{position:relative;display:flex;align-items:center;gap:14px;}
+    .roleta-master-ico{font-size:2rem;filter:drop-shadow(0 0 8px rgba(167,139,250,.8));}
+    .roleta-master-main{font-weight:800;color:#a78bfa;font-size:.92rem;letter-spacing:.05em;}
+    .roleta-master-sub{font-size:.72rem;color:var(--text-mid);margin-top:2px;}
+    .roleta-bonus-banner{position:relative;padding:14px 18px;margin-bottom:18px;background:linear-gradient(135deg,rgba(16,185,129,.15) 0%,rgba(34,197,94,.08) 100%);border:1px solid rgba(34,197,94,.4);border-radius:14px;overflow:hidden;}
+    .roleta-bonus-glow{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(34,197,94,.3) 0%,transparent 50%);animation:roletaPulse 3s ease-in-out infinite;}
+    @keyframes roletaPulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.1);opacity:1;}}
+    .roleta-bonus-content{position:relative;display:flex;align-items:center;gap:14px;}
+    .roleta-bonus-ico{font-size:2rem;filter:drop-shadow(0 0 8px rgba(34,197,94,.6));}
+    .roleta-bonus-main{font-weight:700;color:#4ade80;font-size:.92rem;}
+    .roleta-bonus-main b{font-size:1.1rem;}
+    .roleta-bonus-sub{font-size:.72rem;color:var(--text-mid);margin-top:2px;}
+    .roleta-cooldown-banner{display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:18px;background:rgba(224,192,96,.08);border:1px solid rgba(224,192,96,.3);border-radius:14px;}
+    .roleta-cooldown-ico{font-size:2rem;}
+    .roleta-cooldown-main{font-size:.78rem;color:var(--text-mid);letter-spacing:.04em;}
+    .roleta-cooldown-timer{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:800;color:var(--warn);letter-spacing:.05em;margin-top:2px;}
+    .roleta-cooldown-hint{font-size:.68rem;color:var(--text-dim);margin-top:6px;font-style:italic;}
+    .roleta-stage{position:relative;display:flex;flex-direction:column;align-items:center;padding:30px 0;}
+    .roleta-wheel-wrap{position:relative;width:min(420px,92vw);aspect-ratio:1;}
+    .roleta-canvas-container{position:relative;width:100%;height:100%;filter:drop-shadow(0 12px 40px rgba(0,0,0,.6));}
+    #roleta-canvas{width:100%;height:100%;transition:transform 5.5s cubic-bezier(0.15,0.7,0.1,1);transform:rotate(0deg);}
+    .roleta-pointer{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-top:44px solid #fff;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(251,191,36,.6));z-index:10;}
+    .roleta-pointer::after{content:'';position:absolute;top:-48px;left:-8px;width:16px;height:16px;background:#fbbf24;border-radius:50%;box-shadow:0 0 20px rgba(251,191,36,.8);}
+    .roleta-leds{position:absolute;top:50%;left:50%;width:100%;height:100%;transform:translate(-50%,-50%);pointer-events:none;}
+    .roleta-led{position:absolute;width:10px;height:10px;border-radius:50%;}
+    .roleta-led.on{background:#fbbf24;box-shadow:0 0 12px #fbbf24,0 0 20px #fbbf24;}
+    .roleta-led.off{background:rgba(255,255,255,.15);box-shadow:0 0 4px rgba(255,255,255,.1);}
+    .roleta-spin-btn{margin-top:30px;position:relative;padding:18px 48px;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 50%,#dc2626 100%);border:none;border-radius:999px;color:#000;font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:.1em;cursor:pointer;box-shadow:0 8px 32px rgba(245,158,11,.5),inset 0 2px 0 rgba(255,255,255,.3);transition:all .2s;overflow:hidden;}
+    .roleta-spin-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transition:left .6s;}
+    .roleta-spin-btn:hover::before{left:100%;}
+    .roleta-spin-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(245,158,11,.7),inset 0 2px 0 rgba(255,255,255,.3);}
+    .roleta-spin-btn.spinning{pointer-events:none;opacity:.7;}
+    .roleta-prizes{margin-top:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;}
+    .roleta-prize-card{position:relative;padding:18px 14px;border-radius:16px;text-align:center;overflow:hidden;transition:transform .25s;}
+    .roleta-prize-card:hover{transform:translateY(-4px);}
+    .roleta-prize-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--card-glow) 0%,transparent 70%);opacity:.6;pointer-events:none;}
+    .roleta-prize-card::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,.1) 50%,transparent 60%);animation:roletaShimmer 3s linear infinite;pointer-events:none;}
+    @keyframes roletaShimmer{0%{transform:translateX(-50%) translateY(-50%);}100%{transform:translateX(50%) translateY(50%);}}
+    .roleta-prize-icon{font-size:2.2rem;margin-bottom:8px;filter:drop-shadow(0 0 12px var(--card-glow));}
+    .roleta-prize-value{font-family:'Orbitron',sans-serif;font-size:1.35rem;font-weight:900;color:var(--card-color);letter-spacing:.04em;margin-bottom:4px;text-shadow:0 0 12px var(--card-glow);}
+    .roleta-prize-name{font-size:.72rem;color:var(--card-color);letter-spacing:.08em;text-transform:uppercase;font-weight:700;}
+    .roleta-prize-rarity{position:absolute;top:8px;right:8px;font-size:.55rem;padding:2px 6px;border-radius:6px;font-weight:700;background:rgba(0,0,0,.5);color:var(--card-color);letter-spacing:.05em;border:1px solid var(--card-color);}
+    .roleta-prize-card.common{--card-color:#4ade80;--card-glow:rgba(74,222,128,.5);background:linear-gradient(135deg,rgba(16,185,129,.12) 0%,rgba(5,150,105,.06) 100%);border:1px solid rgba(74,222,128,.4);}
+    .roleta-prize-card.uncommon{--card-color:#60a5fa;--card-glow:rgba(96,165,250,.5);background:linear-gradient(135deg,rgba(59,130,246,.12) 0%,rgba(29,78,216,.06) 100%);border:1px solid rgba(96,165,250,.4);}
+    .roleta-prize-card.rare{--card-color:#fbbf24;--card-glow:rgba(251,191,36,.5);background:linear-gradient(135deg,rgba(245,158,11,.12) 0%,rgba(180,83,9,.06) 100%);border:1px solid rgba(251,191,36,.4);}
+    .roleta-prize-card.epic{--card-color:#f87171;--card-glow:rgba(248,113,113,.5);background:linear-gradient(135deg,rgba(239,68,68,.12) 0%,rgba(153,27,27,.06) 100%);border:1px solid rgba(248,113,113,.4);}
+    .roleta-prize-card.epic2{--card-color:#a78bfa;--card-glow:rgba(167,139,250,.5);background:linear-gradient(135deg,rgba(139,92,246,.12) 0%,rgba(91,33,182,.06) 100%);border:1px solid rgba(167,139,250,.4);}
+    .roleta-prize-card.legendary{--card-color:#f9a8d4;--card-glow:rgba(236,72,153,.7);background:linear-gradient(135deg,rgba(236,72,153,.18) 0%,rgba(157,23,77,.08) 100%);border:2px solid rgba(249,168,212,.6);animation:legendaryPulse 2.5s ease-in-out infinite;}
+    @keyframes legendaryPulse{0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.4);}50%{box-shadow:0 0 30px 8px rgba(236,72,153,.3);}}
+
+    .roleta-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+    .roleta-result{position:relative;max-width:440px;width:100%;padding:36px 30px;background:linear-gradient(135deg,rgba(14,14,16,.98) 0%,rgba(20,20,24,.98) 100%);border-radius:24px;border:2px solid var(--result-color,#fbbf24);box-shadow:0 0 60px var(--result-glow,rgba(251,191,36,.5)),0 20px 60px rgba(0,0,0,.7);text-align:center;overflow:hidden;animation:resultEnter .5s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes resultEnter{0%{transform:scale(.7) translateY(40px);opacity:0;}100%{transform:scale(1) translateY(0);opacity:1;}}
+    .roleta-result::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--result-color,#fbbf24),transparent);animation:resultShine 2s ease-in-out infinite;}
+    @keyframes resultShine{0%,100%{opacity:.5;}50%{opacity:1;}}
+    .roleta-result-icon{font-size:4rem;margin-bottom:12px;filter:drop-shadow(0 0 20px var(--result-glow));}
+    .roleta-result-rarity{display:inline-block;padding:4px 14px;margin-bottom:14px;background:rgba(0,0,0,.4);border:1px solid var(--result-color);color:var(--result-color);border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+    .roleta-result-value{font-family:'Orbitron',sans-serif;font-size:3.2rem;font-weight:900;color:var(--result-color);margin:8px 0 16px;letter-spacing:.04em;text-shadow:0 0 30px var(--result-glow);animation:resultValuePulse 1.5s ease-in-out infinite;}
+    @keyframes resultValuePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+    .roleta-result-msg{color:var(--text-mid);font-size:.88rem;line-height:1.6;margin-bottom:22px;}
+    .roleta-result-msg b{color:var(--text);}
+    .roleta-result-cta{padding:8px 16px;background:rgba(251,191,36,.1);border:1px dashed rgba(251,191,36,.4);border-radius:10px;font-size:.78rem;color:var(--warn);margin-bottom:20px;}
+    .roleta-result-btn{padding:14px 32px;background:linear-gradient(135deg,#fff 0%,#fbbf24 100%);border:none;border-radius:999px;color:#000;font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:.1em;cursor:pointer;box-shadow:0 8px 24px rgba(251,191,36,.4);transition:transform .2s;}
+    .roleta-result-btn:hover{transform:translateY(-2px);}
+    .confetti-piece{position:fixed;width:10px;height:10px;top:-10px;z-index:9998;pointer-events:none;animation:confettiFall 3s linear forwards;}
+    @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+    .roleta-info{padding:18px 20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;margin-top:20px;}
+    .roleta-info-title{font-size:.78rem;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase;}
+    .roleta-info-text{font-size:.82rem;color:var(--text-mid);line-height:1.7;}
+    .roleta-info-text b{color:var(--text);}
+    .roleta-info-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+    .roleta-info-step-num{flex:0 0 24px;height:24px;background:linear-gradient(135deg,#fbbf24,#dc2626);color:#000;font-weight:800;font-size:.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+
+    .sg-price-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;margin-bottom:8px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.35);border-radius:12px;}
+    .sg-price-qtd{font-weight:800;color:var(--text);font-size:.9rem;}
+    .sg-price-val{font-family:'Orbitron',sans-serif;font-weight:800;color:#fbbf24;font-size:.95rem;}
+    .sg-best{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.45);}
+    .sg-best .sg-price-val{color:#4ade80;}
+    .sg-slogan{margin-top:12px;font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:800;color:#4ade80;letter-spacing:.06em;line-height:1.5;}
+
+    .bonus-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;}
+    .bonus-modal-content{max-width:480px;width:100%;max-height:85vh;overflow-y:auto;padding:28px;background:linear-gradient(135deg,rgba(14,14,16,.98) 0%,rgba(20,20,24,.98) 100%);border:2px solid rgba(139,92,246,.5);border-radius:20px;box-shadow:0 0 60px rgba(139,92,246,.3);}
+    .bonus-modal-title{font-family:'Orbitron',sans-serif;font-size:1.15rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px;letter-spacing:.08em;}
+    .bonus-modal-sub{text-align:center;font-size:.78rem;color:var(--text-mid);margin-bottom:22px;}
+    .bonus-user-list{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;padding-right:4px;}
+    .bonus-user-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);border-radius:12px;cursor:pointer;transition:all .2s;}
+    .bonus-user-item:hover{background:rgba(255,255,255,.06);border-color:rgba(139,92,246,.5);transform:translateX(2px);}
+    .bonus-user-avatar{flex:0 0 42px;width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:#fff;}
+    .bonus-user-info{flex:1;min-width:0;}
+    .bonus-user-name{font-weight:700;font-size:.92rem;color:var(--text);}
+    .bonus-user-cargo{font-size:.7rem;color:var(--text-mid);margin-top:2px;}
+    .bonus-user-giros{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 8px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.4);border-radius:999px;font-size:.68rem;font-weight:700;color:#4ade80;}
+    .bonus-modal-close{margin-top:18px;width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:10px;color:var(--text-mid);font-weight:600;cursor:pointer;transition:all .2s;}
+    .bonus-modal-close:hover{background:rgba(255,255,255,.05);color:var(--text);}
+
+    @media (max-width:520px){
+      .roleta-hero{padding:20px 16px;}
+      .roleta-hero-title{font-size:1.15rem;}
+      .roleta-prizes{grid-template-columns:repeat(2,1fr);gap:10px;}
+      .roleta-prize-card{padding:14px 10px;}
+      .roleta-prize-icon{font-size:1.8rem;}
+      .roleta-prize-value{font-size:1.1rem;}
+      .roleta-prize-name{font-size:.62rem;}
+      .roleta-spin-btn{padding:16px 36px;font-size:.88rem;}
+      .roleta-result-value{font-size:2.4rem;}
+      .roleta-result-icon{font-size:3rem;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════ TELA DE LOGIN ══════════════ -->
+  <div id="s-login" class="screen active">
+    <div class="login-mark">DEMID</div>
+    <div class="login-sub">Departamento de Mídia e Comunicação</div>
+    <div class="login-card">
+      <h2>▸ ACESSO RESTRITO</h2>
+      <div class="fg">
+        <label>Usuário</label>
+        <input type="text" id="l-user" placeholder="Login do sistema" autocomplete="username">
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <div class="input-wrap">
+          <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="eye-btn" id="eye-btn" onclick="toggleSenhaVisivel()" tabindex="-1">👁</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="btn-login" onclick="login()">▸ AUTENTICAR</button>
+      <div class="hint-box">
+        <p class="hint">Acesso monitorado. O uso indevido resultará em punição administrativa e bloqueio permanente.</p>
+      </div>
+    </div>
+    <div id="ws-status" class="ws-status-bar">🔴 DESCONECTADO</div>
+  </div>
+
+  <!-- ══════════════ TELA DE SUSPENSÃO ══════════════ -->
+  <div id="s-ban" class="screen">
+    <div class="ban-container">
+      <div class="ban-icon">⛔</div>
+      <div class="ban-title">ACESSO SUSPENSO</div>
+      <div class="ban-subtitle">Você foi temporariamente suspenso do sistema</div>
+
+      <div class="ban-timer-wrap">
+        <div class="ban-timer-label">TEMPO RESTANTE</div>
+        <div id="ban-timer" class="ban-timer">00:00:00</div>
+      </div>
+
+      <div class="ban-info-grid">
+        <div class="ban-info-row">
+          <span class="ban-info-label">APLICADO POR</span>
+          <span id="ban-by" class="ban-info-value">—</span>
+        </div>
+        <div class="ban-info-row">
+          <span class="ban-info-label">MOTIVO</span>
+          <span id="ban-reason" class="ban-info-value">—</span>
+        </div>
+        <div class="ban-info-row">
+          <span class="ban-info-label">EXPIRA EM</span>
+          <span id="ban-expires" class="ban-info-value">—</span>
+        </div>
+      </div>
+
+      <div id="ban-status-msg" class="ban-status-msg">
+        Aguarde o fim da suspensão para recuperar o acesso ao sistema.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ PAINEL PRINCIPAL ══════════════ -->
+  <div id="s-panel" class="screen">
+    <header class="topbar">
+      <div class="topbar-l">
+        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleNavDrawer()" aria-label="Menu">☰</button>
+        <div class="topbar-logo">DEMID</div>
+        <div class="topbar-div"></div>
+        <div id="tb-badge" class="cargo-badge">CARGO</div>
+      </div>
+      <div class="topbar-r">
+        <div id="ws-pill" class="ws-pill">🔴</div>
+        <div id="notif-pill" class="notif-pill">
+          <div class="notif-dot"></div>
+          <span id="notif-txt">0 PENDENTES</span>
+        </div>
+        <div id="tb-user" class="topbar-user">NOME</div>
+        <div class="settings-wrap">
+          <button class="settings-btn" onclick="toggleSettings()" title="Configurações">⚙</button>
+          <div id="settings-menu" class="settings-menu">
+            <button class="settings-item" onclick="abrirModalPerfil();closeSettings();">👤 Meu Perfil Personalizado (VIP)</button>
+            <button class="settings-item" onclick="openModal('m-senha');closeSettings();">🔑 Alterar Senha</button>
+            <div class="settings-divider"></div>
+            <button class="settings-item danger" onclick="logout()">🔒 Sair do Sistema</button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <nav id="tabs" class="tabs"></nav>
+    <div class="nav-drawer-overlay" id="nav-overlay" onclick="closeNavDrawer()"></div>
+    <div id="nav-drawer" class="nav-drawer"></div>
+    <main id="content" class="content"></main>
+  </div>
+
+  <!-- ══════════════ MODAL: MEU PERFIL ══════════════ -->
+  <div id="m-perfil" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>👤 MEU PERFIL</h3><button class="modal-close" onclick="closeModal('m-perfil')">&times;</button></div>
+      <div class="modal-b">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;padding:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.15);border-radius:14px;">
+          <div id="pf-avatar" class="u-avatar" style="width:64px;height:64px;font-size:1.8rem;">?</div>
+          <div style="flex:1;">
+            <div id="pf-nome" style="font-size:1.1rem;font-weight:700;margin-bottom:4px;">Nome</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="pf-cargo" class="cargo-badge">Cargo</span>
+              <span id="pf-vip-badge" style="display:none;padding:4px 10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.05em;">🌟 VIP</span>
+            </div>
+          </div>
+        </div>
+        <div id="pf-foto-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0;">📷 Escolher Foto<input type="file" id="pf-foto-input" accept="image/*" style="display:none;" onchange="uploadFotoPerfil()"></label>
+          <button id="pf-foto-remove" class="btn btn-ghost btn-sm" style="display:none;" onclick="removerFotoPerfil()">🗑 Remover Foto</button>
+        </div>
+        <div id="pf-foto-status" style="font-size:.7rem;color:var(--text-dim);margin-bottom:16px;"></div>
+        <div style="margin-bottom:16px;padding:12px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);border-radius:10px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);margin-bottom:6px;">@USUÁRIO</div>
+          <div id="pf-user" style="font-size:.9rem;color:var(--accent);font-weight:600;">@usuario</div>
+        </div>
+        <div id="pf-recado-area">
+          <div class="fg">
+            <label>💬 Meu Recado <span id="pf-vip-hint" style="font-size:.68rem;color:var(--text-dim);">(máx 200 caracteres)</span></label>
+            <textarea id="pf-recado" placeholder="Escreva algo sobre você..." style="min-height:80px;" maxlength="200" oninput="atualizarContadorRecado()"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+              <span id="pf-recado-count" style="font-size:.68rem;color:var(--text-dim);">0/200</span>
+              <span id="pf-recado-lock" style="display:none;font-size:.72rem;color:var(--warn);">🔒 Apenas usuários VIP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-perfil')">FECHAR</button>
+        <button id="pf-save-btn" class="btn btn-primary btn-sm" onclick="salvarRecado()">💾 SALVAR RECAD0</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: ALTERAR SENHA ══════════════ -->
+  <div id="m-senha" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>▸ ALTERAR SENHA</h3><button class="modal-close" onclick="closeModal('m-senha')">&times;</button></div>
+      <div class="modal-b">
+        <div class="fg"><label>Senha Atual</label><input type="password" id="s-atual"></div>
+        <div class="fg"><label>Nova Senha</label><input type="password" id="s-nova"></div>
+        <div class="fg"><label>Confirmar Nova Senha</label><input type="password" id="s-conf"></div>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-senha')">CANCELAR</button>
+        <button class="btn btn-primary btn-sm" onclick="alterarSenhaPropria()">SALVAR ALTERAÇÕES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: NOVO USUÁRIO ══════════════ -->
+  <div id="m-novo-user" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>▸ CRIAR NOVO USUÁRIO</h3><button class="modal-close" onclick="closeModal('m-novo-user')">&times;</button></div>
+      <div class="modal-b">
+        <div class="fg"><label>Nome Completo</label><input type="text" id="nu-nome"></div>
+        <div class="fg"><label>Login (Único)</label><input type="text" id="nu-user"></div>
+        <div class="fg">
+          <label>Cargo</label>
+          <select id="nu-cargo">
+            <option value="gm">Estagiário</option>
+            <option value="agente">Jornalista</option>
+            <option value="tatico">Editor júnior</option>
+            <option value="escrivao">Editor</option>
+            <option value="editor_chefe">Editor chefe</option>
+            <option value="chefe">Diretor</option>
+            <option value="admin">Painel Master</option>
+          </select>
+        </div>
+        <div class="fg"><label>Senha Inicial</label><input type="password" id="nu-pass"></div>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-novo-user')">CANCELAR</button>
+        <button class="btn btn-success btn-sm" onclick="criarUsuario()">CRIAR ACESSO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: REBAIXAR ══════════════ -->
+  <div id="m-rebaixar" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>▸ CONFIRMAR REBAIXAMENTO</h3><button class="modal-close" onclick="cancelarRebaixar()">&times;</button></div>
+      <div class="modal-b">
+        <div id="rb-info" style="color:var(--text-mid);font-size:.9rem;line-height:1.6;margin-bottom:16px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.18);border-radius:14px;"></div>
+        <div class="fg">
+          <label>Motivo do Rebaixamento <span style="color:var(--danger);">*</span></label>
+          <textarea id="rb-motivo" placeholder="Descreva o motivo do rebaixamento. Aparecerá nos logs do sistema." style="min-height:90px;"></textarea>
+        </div>
+        <p style="font-size:.68rem;color:var(--text-dim);margin-top:8px;">
+          ⚠ O motivo ficará registrado nos logs: "X rebaixou Y por motivo Z"
+        </p>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="cancelarRebaixar()">CANCELAR</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmarRebaixar()">📉 CONFIRMAR REBAIXAMENTO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: SUSPENSÃO TEMPORÁRIA ══════════════ -->
+  <div id="m-ban" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>▸ APLICAR SUSPENSÃO TEMPORÁRIA</h3><button class="modal-close" onclick="closeModal('m-ban')">&times;</button></div>
+      <div class="modal-b">
+        <div id="bn-info" style="color:var(--text-mid);font-size:.9rem;margin-bottom:16px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.18);border-radius:14px;"></div>
+        <div class="fg">
+          <label>Duração (minutos) <span style="color:var(--danger);">*</span></label>
+          <input type="number" id="bn-duracao" min="1" max="10080" placeholder="Ex: 60 = 1 hora, 1440 = 1 dia">
+        </div>
+        <div class="fg">
+          <label>Motivo da Suspensão <span style="color:var(--danger);">*</span></label>
+          <textarea id="bn-motivo" placeholder="Descreva o motivo da suspensão temporária…" style="min-height:80px;"></textarea>
+        </div>
+        <p style="font-size:.68rem;color:var(--text-dim);margin-top:8px;">
+          ⛔ O usuário verá uma tela de bloqueio com cronômetro regressivo até o fim da suspensão.
+        </p>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-ban')">CANCELAR</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmarBan()">⛔ APLICAR SUSPENSÃO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: EDITAR OCORRÊNCIA ══════════════ -->
+  <div id="m-edit-oc" class="modal-overlay">
+    <div class="modal modal-lg">
+      <div class="modal-h"><h3>▸ EDITAR OCORRÊNCIA</h3><button class="modal-close" onclick="closeModal('m-edit-oc')">&times;</button></div>
+      <div class="modal-b">
+        <div class="g2">
+          <div class="fg"><label>Nome do Agente</label><input type="text" id="eo-nome"></div>
+          <div class="fg"><label>Cargo do Agente</label>
+            <select id="eo-cargo">
+              <option>Estagiário</option><option>Jornalista</option><option>Editor júnior</option>
+              <option>Editor</option><option>Editor-chefe</option><option>Diretor</option><option>Painel Master</option>
+              <option>Civil</option><option>Outro</option>
+            </select>
+          </div>
+          <div class="fg"><label>Status</label>
+            <select id="eo-status">
+              <option value="pendente">⏳ Pendente</option>
+              <option value="aceita">✅ Aceita</option>
+              <option value="recusada">❌ Recusada</option>
+              <option value="cancelada">🚫 Cancelada</option>
+            </select>
+          </div>
+          <div class="fg"><label>Responsável</label><input type="text" id="eo-delegado"></div>
+          <div class="fg g-full"><label>Depoimento</label><textarea id="eo-dep"></textarea></div>
+          <div class="fg g-full"><label>Resposta / Observação</label><textarea id="eo-resp"></textarea></div>
+        </div>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-edit-oc')">CANCELAR</button>
+        <button class="btn btn-primary btn-sm" onclick="salvarEdicaoOc()">SALVAR ALTERAÇÕES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: REDEFINIR SENHA ══════════════ -->
+  <div id="m-reset-senha" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>▸ REDEFINIR SENHA</h3><button class="modal-close" onclick="closeModal('m-reset-senha')">&times;</button></div>
+      <div class="modal-b">
+        <p id="rs-info" style="color:var(--text-mid);margin-bottom:16px;font-size:.9rem;"></p>
+        <div class="fg"><label>Nova Senha</label><input type="password" id="rs-nova"></div>
+        <div class="fg"><label>Confirmar Nova Senha</label><input type="password" id="rs-conf"></div>
+        <input type="hidden" id="rs-target">
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-reset-senha')">CANCELAR</button>
+        <button class="btn btn-warn btn-sm" onclick="confirmarResetSenha()">🔑 REDEFINIR SENHA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: CONFIRMAR EXCLUSÃO ══════════════ -->
+  <div id="m-confirm-del" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-h"><h3>▸ CONFIRMAR EXCLUSÃO</h3><button class="modal-close" onclick="closeModal('m-confirm-del')">&times;</button></div>
+      <div class="modal-b">
+        <p id="del-info" style="color:var(--danger);font-size:.95rem;line-height:1.6;"></p>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('m-confirm-del')">CANCELAR</button>
+        <button class="btn btn-danger btn-sm" id="del-confirm-btn">✘ CONFIRMAR EXCLUSÃO</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/api.js?v=5.32"></script>
+  <script src="js/app.js?v=5.32"></script>
+</body>
+                                                                                               </html>
