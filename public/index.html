@@ -24,14 +24,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=20261002">
-  <link rel="stylesheet" href="css/extra.css?v=20261006">
+  <link rel="stylesheet" href="css/extra.css?v=20261009">
 
   <style>
     /* ══ 1. FONTE PROFISSIONAL ══ */
     *,*::before,*::after{font-family:'Inter','Roboto',system-ui,-apple-system,'Segoe UI',sans-serif !important;}
     body::after{display:none !important;}
     .login-mark{animation:none !important;font-weight:800 !important;letter-spacing:.06em !important;}
-    .login-mark,.topbar-logo,.stat-num,#rel-clock,#ban-timer{font-variant-numeric:tabular-nums;}
     .login-sub,.fg label,.tbl th,.stat-lbl,.oc-meta,.hint,.oc-f label,.resp-lbl,.log-time,
     .ban-subtitle,.ban-timer-label,.ban-info-label,.ws-status-bar,.topbar-user,.notif-pill,.empty p{letter-spacing:.06em !important;}
     .stitle,.tab,.btn,.nav-drawer-item,.modal-h h3,.cargo-badge,.status-chip,.tipo-badge,.ban-badge,.ban-title{letter-spacing:.04em !important;}
@@ -68,7 +67,6 @@
     .tab.active{background:#fff !important;border-color:rgba(255,255,255,.9) !important;color:#0a0a0b !important;}
     .tabs{gap:8px !important;padding:12px 16px !important;}
     .cargo-badge,.status-chip,.tipo-badge,.ban-badge,.notif-pill{border-radius:999px !important;padding:4px 10px !important;}
-    /* ══ CORREÇÃO: background-color em vez de background (para permitir imagem inline) ══ */
     .u-avatar{border-radius:12px !important;background-color:rgba(255,255,255,.08) !important;border:1px solid rgba(255,255,255,.3) !important;color:#fff !important;position:relative;overflow:hidden;}
     .nav-drawer{border-radius:0 0 22px 22px !important;}
     .ban-timer-wrap{border-radius:18px !important;}
@@ -171,7 +169,7 @@
     .roleta-bonus-glow{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(34,197,94,.3) 0%,transparent 50%);animation:roletaPulse 3s ease-in-out infinite;}
     @keyframes roletaPulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.1);opacity:1;}}
     .roleta-bonus-content{position:relative;display:flex;align-items:center;gap:14px;}
-    .roleta-bonus-ico{font-size:2rem;filter:drop-shadow(0 0 8px rgba(34,197,94,.6));}
+    .roleta-bonus-ico{font-size:2rem;filter:drop-shadow(0 0 12px rgba(34,197,94,.6));}
     .roleta-bonus-main{font-weight:700;color:#4ade80;font-size:.92rem;}
     .roleta-bonus-main b{font-size:1.1rem;}
     .roleta-bonus-sub{font-size:.72rem;color:var(--text-mid);margin-top:2px;}
@@ -566,5 +564,214 @@
 
   <script src="js/api.js?v=5.33"></script>
   <script src="js/app.js?v=5.34"></script>
+  <script>
+  /* ══════════════════════════════════════════════════════════════
+     ADDONS DEMID — CPF/RG NA CARTEIRA · ZAP VIP ("CHAMAR EU") ·
+     REGISTRAR RELATÓRIO — auto-contido, não altera o sistema.
+     Persistência local por usuário (localStorage).
+     ══════════════════════════════════════════════════════════════ */
+  (function(){
+  'use strict';
+  var ADK='demid_addons_';
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function curUser(){
+    try{
+      var el=document.getElementById('pf-user');
+      if(el){var t=(el.textContent||'').trim();if(t&&t!=='@usuario')return t.replace(/^@/,'');}
+      if(window.STATE){var s=window.STATE;
+        if(s.me&&s.me.user)return s.me.user;
+        if(s.user&&s.user.user)return s.user.user;
+        if(typeof s.me==='string'&&s.me)return s.me;
+        if(typeof s.user==='string'&&s.user)return s.user;}
+      var tb=document.getElementById('tb-user');
+      if(tb&&(tb.textContent||'').trim())return 'nome:'+(tb.textContent||'').trim();
+    }catch(e){}
+    return 'anon';
+  }
+  function load(){try{return JSON.parse(localStorage.getItem(ADK+curUser()))||{};}catch(e){return {};}}
+  function save(d){try{localStorage.setItem(ADK+curUser(),JSON.stringify(d));}catch(e){}}
+  function isVip(){try{return (typeof window.vipAtivo==='function')?!!window.vipAtivo():true;}catch(e){return true;}}
+  function T(m,t){try{if(typeof window.toast==='function')window.toast(m,t||'s');}catch(e){}}
+  function openM(id){try{if(typeof window.openModal==='function')window.openModal(id);}catch(e){var m=document.getElementById(id);if(m)m.classList.add('open');}}
+  function closeM(id){try{if(typeof window.closeModal==='function')window.closeModal(id);}catch(e){var m=document.getElementById(id);if(m)m.classList.remove('open');}}
+  function onlyD(v){return String(v||'').replace(/\D/g,'');}
+  function maskCPF(v){v=onlyD(v).slice(0,11);
+    if(v.length>9)return v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+    if(v.length>6)return v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+    if(v.length>3)return v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+    return v;}
+  function validCPF(c){c=onlyD(c);if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;
+    var s=0,i;for(i=0;i<9;i++)s+=+c[i]*(10-i);var d=(s*10)%11;if(d===10)d=0;if(d!==+c[9])return false;
+    s=0;for(i=0;i<10;i++)s+=+c[i]*(11-i);d=(s*10)%11;if(d===10)d=0;return d===+c[10];}
+  function maskRG(v){v=onlyD(v).slice(0,9);
+    if(v.length>6)return v.replace(/(\d{2})(\d{3})(\d{1,3})/,'$1.$2.$3');
+    if(v.length>2)return v.replace(/(\d{2})(\d{1,3})/,'$1.$2');
+    return v;}
+  function maskPhone(v){v=onlyD(v).slice(0,13);
+    if(v.length>10)return v.replace(/(\d{2})(\d{5})(\d{1,4})/,'($1) $2-$3');
+    if(v.length>6)return v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+    if(v.length>2)return v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+    return v;}
+  function zapLink(num){var d=onlyD(num);if(d.length<=11)d='55'+d;return 'https://wa.me/'+d;}
+
+  /* ── CPF/RG + ZAP no modal de perfil ── */
+  function injectProfile(){
+    var mb=document.querySelector('#m-perfil .modal-b');
+    if(!mb||document.getElementById('ad-docs-wrap'))return;
+    var w=document.createElement('div');
+    w.id='ad-docs-wrap';
+    w.innerHTML='<div class="stitle" style="margin-top:16px">▸ DOCUMENTOS OFICIAIS & ZAP</div>'+
+      '<div class="ad-docs-grid">'+
+        '<div class="fg"><label>CPF</label><input id="ad-cpf" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off"></div>'+
+        '<div class="fg"><label>RG</label><input id="ad-rg" inputmode="numeric" placeholder="00.000.000-0" autocomplete="off"></div>'+
+      '</div>'+
+      '<div class="fg"><label>📱 WhatsApp (VIP — "chamar eu")</label><input id="ad-zap" inputmode="numeric" placeholder="(00) 00000-000" autocomplete="off"><div id="ad-zap-lock" class="hint" style="display:none;margin-top:5px">🔒 Apenas usuários VIP podem divulgar o ZAP.</div></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+
+        '<button type="button" class="btn btn-primary btn-sm" id="ad-save-docs">💾 SALVAR CPF / RG / ZAP</button>'+
+        '<button type="button" class="btn btn-ghost btn-sm" id="ad-zap-call" style="display:none">📱 ABRIR MEU ZAP</button>'+
+      '</div>';
+    mb.appendChild(w);
+    var cpf=document.getElementById('ad-cpf'),rg=document.getElementById('ad-rg'),zap=document.getElementById('ad-zap');
+    cpf.addEventListener('input',function(){cpf.value=maskCPF(cpf.value);});
+    rg.addEventListener('input',function(){rg.value=maskRG(rg.value);});
+    zap.addEventListener('input',function(){zap.value=maskPhone(zap.value);});
+    document.getElementById('ad-save-docs').addEventListener('click',function(){
+      var d=load();var c=cpf.value.trim(),r=rg.value.trim(),z=zap.value.trim();
+      if(c&&!validCPF(c)){T('CPF inválido. Verifique os dígitos.','d');return;}
+      d.cpf=c;d.rg=r;if(isVip()){d.zap=z;}
+      save(d);refreshWallet();T('Documentos salvos na carteira oficial.','s');
+    });
+    document.getElementById('ad-zap-call').addEventListener('click',function(){
+      var d=load();if(!d.zap){T('Cadastre seu WhatsApp primeiro.','w');return;}
+      window.open(zapLink(d.zap),'_blank');
+    });
+    syncProfile();
+  }
+  function syncProfile(){
+    var wrap=document.getElementById('ad-docs-wrap');if(!wrap)return;
+    var d=load();
+    var cpf=document.getElementById('ad-cpf'),rg=document.getElementById('ad-rg'),zap=document.getElementById('ad-zap');
+    if(!cpf)return;
+    if(document.activeElement!==cpf)cpf.value=d.cpf?maskCPF(d.cpf):'';
+    if(document.activeElement!==rg)rg.value=d.rg?maskRG(d.rg):'';
+    var vip=isVip();
+    zap.disabled=!vip;
+    document.getElementById('ad-zap-lock').style.display=vip?'none':'block';
+    if(document.activeElement!==zap)zap.value=d.zap?maskPhone(d.zap):'';
+    document.getElementById('ad-zap-call').style.display=(vip&&d.zap)?'inline-flex':'none';
+  }
+
+  /* ── CPF/RG exibidos na carteira oficial ── */
+  function walletDocsHTML(d){
+    return '<div class="ad-doc-cell"><small>CPF</small><strong>'+esc(d&&d.cpf?d.cpf:'—')+'</strong></div>'+
+           '<div class="ad-doc-cell"><small>RG</small><strong>'+esc(d&&d.rg?d.rg:'—')+'</strong></div>';
+  }
+  function injectWallet(){
+    var d=load();
+    var wb=document.querySelector('.wallet-body');
+    if(wb&&!wb.querySelector('.ad-doc-cell')){wb.insertAdjacentHTML('beforeend',walletDocsHTML(d));}
+    var we=document.querySelector('.wallet-empty');
+    if(we&&!document.getElementById('ad-docs-card')){
+      we.insertAdjacentHTML('beforebegin',
+        '<div class="card c-none" id="ad-docs-card" style="margin-bottom:14px">'+
+          '<div class="stitle">▸ DOCUMENTOS OFICIAIS (CPF / RG)</div>'+
+          ((d.cpf||d.rg)?('<div class="ad-docs-grid">'+walletDocsHTML(d)+'</div>'):'<p class="hint">Nenhum documento registrado. Abra ⚙ → Meu Perfil para registrar CPF e RG.</p>')+
+        '</div>');
+    }
+  }
+  function refreshWallet(){
+    document.querySelectorAll('.wallet-body .ad-doc-cell').forEach(function(n){n.remove();});
+    var c=document.getElementById('ad-docs-card');if(c)c.remove();
+    injectWallet();
+  }
+
+  /* ── Registrar Relatório (modal + botão flutuante) ── */
+  function relModalHTML(){
+    return '<div id="m-relatorio" class="modal-overlay">'+
+      '<div class="modal">'+
+        '<div class="modal-h"><h3>▸ REGISTRAR RELATÓRIO</h3><button class="modal-close" id="rl-close" type="button">&times;</button></div>'+
+        '<div class="modal-b">'+
+          '<div class="g2">'+
+            '<div class="fg"><label>Tipo</label><select id="rl-tipo"><option>Ocorrência</option><option>Serviço</option><option>Patrulha</option><option>Imprensa</option><option>Outro</option></select></div>'+
+            '<div class="fg"><label>Título</label><input id="rl-titulo" placeholder="Resumo do relatório" autocomplete="off"></div>'+
+          '</div>'+
+          '<div class="fg"><label>Descrição completa</label><textarea id="rl-texto" placeholder="Descreva fatos, horários, locais e envolvidos…"></textarea></div>'+
+          '<div class="stitle" style="margin-top:16px">▸ RELATÓRIOS REGISTRADOS</div>'+
+          '<div id="rl-lista"></div>'+
+        '</div>'+
+        '<div class="modal-f">'+
+          '<button class="btn btn-ghost btn-sm" id="rl-cancel" type="button">FECHAR</button>'+
+          '<button class="btn btn-primary btn-sm" id="rl-save" type="button">📄 REGISTRAR RELATÓRIO</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<button id="ad-fab" type="button" title="Registrar Relatório" aria-label="Registrar Relatório">📄</button>';
+  }
+  function renderRel(){
+    var box=document.getElementById('rl-lista');if(!box)return;
+    var d=load();var rel=(d.relatorios||[]).slice().sort(function(a,b){return b.ts-a.ts;});
+    if(!rel.length){box.innerHTML='<div class="empty" style="padding:26px 14px"><div class="empty-ico">📄</div><p>Nenhum relatório registrado ainda.</p></div>';return;}
+    box.innerHTML=rel.map(function(r){
+      return '<div class="ad-rel-item" data-id="'+r.id+'">'+
+        '<div class="ad-rel-head"><b>'+esc(r.titulo)+'</b><span class="tipo-badge tipo-oc">'+esc(r.tipo)+'</span></div>'+
+        '<div class="ad-rel-meta">'+new Date(r.ts).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})+' · '+esc(r.autor||curUser())+'</div>'+
+        '<div class="ad-rel-text">'+esc(r.texto)+'</div>'+
+        '<div class="ad-rel-actions">'+
+          '<button type="button" class="btn btn-ghost btn-xs" data-act="copy">📋 COPIAR</button>'+
+          '<button type="button" class="btn btn-danger btn-xs" data-act="del">🗑 EXCLUIR</button>'+
+        '</div></div>';
+    }).join('');
+  }
+  function injectRel(){
+    if(document.getElementById('m-relatorio'))return;
+    document.body.insertAdjacentHTML('beforeend',relModalHTML());
+    document.getElementById('ad-fab').addEventListener('click',function(){renderRel();openM('m-relatorio');});
+    document.getElementById('rl-close').addEventListener('click',function(){closeM('m-relatorio');});
+    document.getElementById('rl-cancel').addEventListener('click',function(){closeM('m-relatorio');});
+    document.getElementById('rl-save').addEventListener('click',function(){
+      var tipo=document.getElementById('rl-tipo').value;
+      var titulo=document.getElementById('rl-titulo').value.trim();
+      var texto=document.getElementById('rl-texto').value.trim();
+      if(!titulo||!texto){T('Preencha título e descrição do relatório.','w');return;}
+      var d=load();d.relatorios=d.relatorios||[];
+      d.relatorios.push({id:Date.now(),ts:Date.now(),tipo:tipo,titulo:titulo,texto:texto,autor:curUser()});
+      save(d);
+      document.getElementById('rl-titulo').value='';document.getElementById('rl-texto').value='';
+      renderRel();T('Relatório registrado com sucesso.','s');
+    });
+    document.getElementById('rl-lista').addEventListener('click',function(ev){
+      var btn=ev.target.closest?ev.target.closest('button[data-act]'):null;if(!btn)return;
+      var item=btn.closest('.ad-rel-item');var id=+item.getAttribute('data-id');
+      var d=load();d.relatorios=d.relatorios||[];
+      var r=d.relatorios.filter(function(x){return x.id===id;})[0];
+      if(!r)return;
+      if(btn.getAttribute('data-act')==='copy'){
+        var txt='RELATÓRIO '+r.tipo+' — '+r.titulo+'\n'+new Date(r.ts).toLocaleString('pt-BR')+'\n\n'+r.texto;
+        try{navigator.clipboard.writeText(txt);T('Relatório copiado.','s');}catch(e){T('Não foi possível copiar.','d');}
+      }else{
+        if(!confirm('Excluir este relatório?'))return;
+        d.relatorios=d.relatorios.filter(function(x){return x.id!==id;});
+        save(d);renderRel();T('Relatório excluído.','w');
+      }
+    });
+  }
+
+  function injectAll(){
+    injectProfile();
+    injectWallet();
+    injectRel();
+    var mp=document.getElementById('m-perfil');
+    if(mp&&mp.classList.contains('open'))syncProfile();
+  }
+  var pend=false;
+  function queue(){if(pend)return;pend=true;requestAnimationFrame(function(){pend=false;injectAll();});}
+  function start(){
+    injectAll();
+    new MutationObserver(queue).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+  window.adAbrirRelatorio=function(){renderRel();openM('m-relatorio');};
+  })();
+  </script>
 </body>
-    </html>
+            </html>
