@@ -491,3 +491,26 @@ body[data-demid-theme="media"] input,body[data-demid-theme="media"] select,body[
 body[data-demid-theme="media"] input:focus,body[data-demid-theme="media"] select:focus,body[data-demid-theme="media"] textarea:focus{border-color:#ff9b2e!important;box-shadow:0 0 0 2px rgba(255,121,0,.18),0 0 15px rgba(255,94,0,.22)!important}
 body[data-demid-theme="media"] .status-chip,body[data-demid-theme="media"] .cargo-badge{border-color:#b85919!important;box-shadow:0 0 8px rgba(255,100,0,.18)}
 body[data-demid-theme="media"] .demid-theme-swatch.theme-media{background:radial-gradient(circle at 50% 0,#ffe082 0,#ff9d24 22%,#ff5a00 48%,#170501 100%)!important;box-shadow:0 0 28px rgba(255,102,0,.85),inset 0 0 28px rgba(255,218,112,.35)!important}
+
+/* ══ USUÁRIOS — MOBILE: ações sempre visíveis e clicáveis ══ */
+@media (max-width:900px){
+  .tbl-wrap:has(.users-table){overflow:visible!important;width:100%;}
+  .users-table{display:block!important;width:100%!important;table-layout:fixed;border-collapse:separate!important;border-spacing:0 10px!important;font-size:.78rem!important;}
+  .users-table thead{display:none!important;}
+  .users-table tbody,.users-table tr{display:block!important;width:100%!important;}
+  .users-table tr{padding:12px 12px 10px!important;border:1px solid rgba(209,93,22,.58)!important;border-radius:12px!important;background:linear-gradient(145deg,rgba(20,12,8,.98),rgba(5,5,6,.98))!important;box-shadow:0 0 14px rgba(255,91,0,.12)!important;box-sizing:border-box;}
+  .users-table td{display:flex!important;align-items:center;justify-content:space-between;gap:10px;width:100%!important;min-width:0!important;padding:9px 2px!important;border:0!important;border-bottom:1px solid rgba(255,140,40,.13)!important;box-sizing:border-box;text-align:right;overflow:visible!important;}
+  .users-table td:last-child{display:block!important;padding-top:12px!important;border-bottom:0!important;text-align:left!important;}
+  .users-table td::before{flex:0 0 auto;color:#c9a994;font:600 .58rem 'Orbitron',sans-serif;letter-spacing:.08em;text-align:left;}
+  .users-table td:nth-child(1)::before{content:'USUÁRIO';}
+  .users-table td:nth-child(2)::before{content:'CARGO';}
+  .users-table td:nth-child(3)::before{content:'STATUS';}
+  .users-table td:nth-child(4)::before{content:'CRIADO POR';}
+  .users-table td:nth-child(5)::before{content:'AÇÕES';display:block;margin-bottom:8px;}
+  .users-table td:nth-child(1)>div{min-width:0;max-width:calc(100% - 72px);}
+  .users-table td:nth-child(1)>div>div:last-child{overflow-wrap:anywhere;}
+  .users-table td:nth-child(2)>*,.users-table td:nth-child(3)>*,.users-table td:nth-child(4)>*{max-width:70%;}
+  .users-table td:nth-child(5)>div{display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-start!important;gap:7px!important;width:100%!important;max-width:100%!important;overflow:visible!important;}
+  .users-table td:nth-child(5) button,.users-table td:nth-child(5) .btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:36px!important;max-width:100%!important;white-space:normal!important;line-height:1.15!important;padding:8px 10px!important;flex:0 1 auto!important;}
+  .users-table .cargo-select{max-width:70%!important;min-width:0!important;}
+                    }
