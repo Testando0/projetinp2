@@ -421,3 +421,28 @@ body[data-demid-theme="emerald"]{--accent:#86efac;--accent-dim:#4ade80;--accent2
 .cb-diretor{background:rgba(80,208,144,.08);color:#50d090;border:1px solid rgba(80,208,144,.2)}
 .cb-editor_chefe{background:rgba(204,136,255,.08);color:#cc88ff;border:1px solid rgba(204,136,255,.2)}
 .cb-editor,.cb-editor_junior,.cb-jornalista{background:rgba(255,255,255,.06);color:#ddd;border:1px solid #333}
+/* Correção de contraste da galeria de temas VIP */
+.dmid-theme-card,
+.dmid-theme-card.card {
+  color: #f8fafc !important;
+  background: linear-gradient(145deg, #17191f, #0f1116) !important;
+  border: 1px solid rgba(148,163,184,.35) !important;
+}
+.dmid-theme-card:hover {
+  background: linear-gradient(145deg, #20242d, #151922) !important;
+  border-color: var(--accent) !important;
+}
+.dmid-theme-card b {
+  display: block;
+  color: #ffffff !important;
+  font-size: .95rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,.75);
+}
+.dmid-theme-card .hint {
+  color: #cbd5e1 !important;
+  opacity: 1 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+.dmid-theme-card .status-chip {
+  color: #052e1b !important;
+  }
