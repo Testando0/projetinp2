@@ -234,7 +234,7 @@ function mostrarAlertaOcorrencia(alerta){if(!podeReceberPendencias()||!alerta||N
 function fecharAlertaOcorrencia(){clearTimeout(_ocAlertTimer);_ocAlertTimer=null;document.getElementById('demid-oc-alert-overlay')?.remove();}
 function sincronizarAlertaFalta(){const minhas=(STATE.faltas||[]).filter(f=>f.userLogin===me?.user);if(!minhas.length){document.getElementById('demid-falta-overlay')?.remove();return;}if(document.getElementById('demid-falta-overlay'))return;const dias=minhas.reduce((n,f)=>n+(Number(f.dias)||0),0);const overlay=document.createElement('div');overlay.id='demid-falta-overlay';overlay.className='demid-urgent-overlay falta-persistente';overlay.setAttribute('role','alert');overlay.innerHTML='<div class="demid-urgent-card falta-alert-card"><div class="demid-urgent-kicker">⚠️ COMUNICADO DISCIPLINAR</div><div class="demid-urgent-title">FALTA REGISTRADA NO SEU EFETIVO</div><div class="demid-urgent-detail">Você possui <b>'+minhas.length+' registro(s)</b>, totalizando <b>'+dias+' dia(s)</b> de falta.<br><br>⛔ A área de ponto está bloqueada até que um Editor chefe, Diretor ou Painel Master retire a falta.</div><div class="demid-urgent-count">ESTE ALERTA PERMANECE ATIVO ATÉ A REMOÇÃO AUTORIZADA</div></div>';document.body.appendChild(overlay);}
 function showLogin(){document.getElementById('s-panel').classList.remove('active');document.getElementById('s-ban').classList.remove('active');document.getElementById('s-login').classList.add('active');setTimeout(()=>{const e=document.getElementById('l-user');if(e)e.focus();},80);}
-function showPanel(){document.body.dataset.demidTheme=localStorage.getItem('demid_theme')||'default';document.getElementById('s-login').classList.remove('active');document.getElementById('s-ban').classList.remove('active');document.getElementById('s-panel').classList.add('active');const badge=document.getElementById('tb-badge');badge.className='cargo-badge '+(CARGO_BADGE_CLASS[me.cargo]||'cb-guarda');badge.textContent=CARGO_LABEL[me.cargo]||me.cargo;document.getElementById('tb-user').textContent=me.nome;startKeepAlive();activeTab=0;buildTabs();renderTab(0);sincronizarAlertaFalta();mostrarAlertaOcorrenciaMaisRecente();updateNotif();}
+function showPanel(){document.body.dataset.demidTheme=normalizarTemaDemid(localStorage.getItem('demid_theme'));document.getElementById('s-login').classList.remove('active');document.getElementById('s-ban').classList.remove('active');document.getElementById('s-panel').classList.add('active');const badge=document.getElementById('tb-badge');badge.className='cargo-badge '+(CARGO_BADGE_CLASS[me.cargo]||'cb-guarda');badge.textContent=CARGO_LABEL[me.cargo]||me.cargo;document.getElementById('tb-user').textContent=me.nome;startKeepAlive();activeTab=0;buildTabs();renderTab(0);sincronizarAlertaFalta();mostrarAlertaOcorrenciaMaisRecente();updateNotif();}
 
 function tabDefs(c){
   const p=CARGO_PERM[c]||0;
@@ -1118,13 +1118,19 @@ async function baterPonto(type){
   finally{setTimeout(()=>{_busyPonto=false;},1500);}
 }
 
+function normalizarTemaDemid(id){
+  const migracao={default:'neutro',midnight:'neutro',emerald:'media'};
+  const tema=migracao[id]||id;
+  return ['media','violet','neutro','master'].includes(tema)?tema:'neutro';
+}
 function aplicarTemaDemid(id){
+  id=normalizarTemaDemid(id);
   if(!vipAtivo()){toast('🌟 Apenas usuários VIP podem alterar o tema.','w');return;}
-  document.body.dataset.demidTheme=id;localStorage.setItem('demid_theme',id);toast('Tema aplicado com sucesso.','s');
+  document.body.dataset.demidTheme=id;localStorage.setItem('demid_theme',id);if(activeTab===getTabIdx('temas'))renderTab(activeTab);toast('Tema aplicado com sucesso.','s');
 }
 function vTemas(){
-  const atual=localStorage.getItem('demid_theme')||'default';
-  const temas=[['default','DEMID Original','Contraste preto e branco, mantendo o visual institucional.'],['midnight','Midnight Blue','Azul profundo com destaque tecnológico.'],['violet','Violet Studio','Roxo discreto para uma identidade criativa.'],['emerald','Emerald Press','Verde editorial para comunicação e produção.']];
+  const atual=normalizarTemaDemid(localStorage.getItem('demid_theme'));
+  const temas=[['media','Mídia Neon','Neon alaranjado com fundo solar para destacar produção e comunicação.'],['violet','Violet','Fundo espacial roxo, mantendo a galáxia atual da DEMID.'],['neutro','Neutro DEMID','Padrão institucional: fundo preto, limpo e discreto.'],['master','Master Rubi','Vermelho rubi intenso, com clima especial de Dia dos Namorados.']];
   return '<div class="stitle">▸ TEMAS DISPONÍVEIS (VIP)</div><div class="card recruitment-hero"><div style="font-size:2.4rem;">🎨</div><h2>Personalize sua experiência</h2><p>Escolha um tema VIP para o seu painel. O design e todas as funcionalidades permanecem os mesmos.</p></div><div class="g2">'+temas.map(t=>'<button class="card demid-theme-card '+(atual===t[0]?'selected':'')+'" onclick="aplicarTemaDemid(\''+t[0]+'\')" style="text-align:left;cursor:pointer;color:#f8fafc !important;background:linear-gradient(145deg,#17191f,#0f1116) !important;border:1px solid rgba(148,163,184,.35) !important;"><div class="demid-theme-swatch theme-'+t[0]+'"></div><b style="color:#fff !important;text-shadow:0 1px 3px rgba(0,0,0,.75);">'+t[1]+'</b><div class="hint" style="margin-top:7px;color:#cbd5e1 !important;opacity:1 !important;text-shadow:0 1px 2px rgba(0,0,0,.7);">'+t[2]+'</div>'+(atual===t[0]?'<div class="status-chip sc-a" style="display:inline-block;margin-top:10px;">ATIVO</div>':'')+'</button>').join('')+'</div>';
 }
 function vAuditoria(){const logs=STATE.audit;if(!logs.length)return'<div class="stitle">▸ AUDITORIA</div>'+empty('🔍','Nenhum evento.');return'<div class="stitle">▸ AUDITORIA DO SISTEMA</div><div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-danger btn-sm" onclick="limparAuditoria()">🗑 LIMPAR LOG</button></div><div class="card c-none" style="max-height:580px;overflow-y:auto;">'+logs.map(l=>'<div class="log-entry"><div class="log-time">'+new Date(l.ts).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</div><div class="log-icon">'+(l.icon||'📋')+'</div><div class="log-txt">'+l.msg+'</div></div>').join('')+'</div><div style="margin-top:10px;" class="hint">'+logs.length+' evento(s).</div>';}
