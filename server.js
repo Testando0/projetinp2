@@ -244,7 +244,8 @@ function sanitize(p) {
     medalhas:               Array.isArray(u.medalhas) ? u.medalhas : [],
     score:                  typeof u.score === 'number' ? u.score : 50,
     sequenciaAtiva:         typeof u.sequenciaAtiva === 'number' ? u.sequenciaAtiva : 0,
-    recordeHoras:           typeof u.recordeHoras === 'number' ? u.recordeHoras : 0
+    recordeHoras:           typeof u.recordeHoras === 'number' ? u.recordeHoras : 0,
+    carteira:               u.carteira && typeof u.carteira === 'object' ? { ...u.carteira } : null,
   }));
   const roletaPremios = Array.isArray(p.roletaPremios) && p.roletaPremios.length > 0
     ? p.roletaPremios.map(pr => ({
@@ -609,6 +610,30 @@ async function handleAPI(req, res) {
   }
 
   if (method === 'GET' && url === '/api/users') return jsonRes(res, 200, DB.users.map(pub));
+  // ═══ CARTEIRA OFICIAL DEMID ═══
+  const mCarteira = url.match(/^\/api\/users\/([^/]+)\/carteira(?:\/decisao)?$/);
+  if (method === 'POST' && mCarteira && url.endsWith('/carteira')) {
+    const target = DB.users.find(u => u.user === decodeURIComponent(mCarteira[1]));
+    const executor = findUserByRef(body.feitorPor);
+    if (!target || !executor || executor.user !== target.user) return jsonRes(res, 403, { error: 'A carteira só pode ser solicitada pelo próprio usuário.' });
+    if (target.carteira && target.carteira.status === 'aprovada') return jsonRes(res, 400, { error: 'Sua carteira oficial já está aprovada.' });
+    if (target.carteira && target.carteira.status === 'pendente') return jsonRes(res, 400, { error: 'Sua carteira já está aguardando aprovação do Master.' });
+    const usados = DB.users.map(u => Number(String(u.carteira?.registro || '').replace('GEMID-','')) || 0);
+    const numero = Math.max(0, ...usados) + 1;
+    target.carteira = { registro: 'GEMID-' + String(numero).padStart(4, '0'), status: 'pendente', solicitadaEm: Date.now(), aprovadaEm: null, aprovadaPor: null };
+    saveData(); audit(`<b>${target.nome}</b> solicitou sua carteira oficial ${target.carteira.registro}.`, '🪪'); broadcast('USERS_UPDATED', DB.users.map(pub));
+    return jsonRes(res, 200, { ok: true, user: pub(target) });
+  }
+  if (method === 'PUT' && mCarteira && url.endsWith('/carteira/decisao')) {
+    const target = DB.users.find(u => u.user === decodeURIComponent(mCarteira[1]));
+    const executor = findUserByRef(body.feitorPor);
+    if (!target || !executor || !isMaster(executor)) return jsonRes(res, 403, { error: 'Apenas o Master pode aprovar carteiras.' });
+    if (!target.carteira || target.carteira.status !== 'pendente') return jsonRes(res, 400, { error: 'Não há uma solicitação pendente para este usuário.' });
+    const aprovar = body.decisao === 'aprovar';
+    target.carteira.status = aprovar ? 'aprovada' : 'recusada'; target.carteira.aprovadaEm = Date.now(); target.carteira.aprovadaPor = executor.user;
+    saveData(); audit(`<b>${executor.nome}</b> ${aprovar ? 'aprovou' : 'recusou'} a carteira ${target.carteira.registro} de <b>${target.nome}</b>.`, aprovar ? '✅' : '❌'); broadcast('USERS_UPDATED', DB.users.map(pub));
+    return jsonRes(res, 200, { ok: true, user: pub(target) });
+  }
 
   if (method === 'POST' && url === '/api/users') {
     const { nome, user, cargo, pass, criadoPor } = body;
@@ -1781,4 +1806,4 @@ if (RENDER_URL) {
     req.on('error', (e) => console.warn('[KeepAlive] Ping falhou:', e.message));
     req.end();
   }, 14 * 60 * 1000);
-   }
+}
