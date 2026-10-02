@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════════════
    EXTRA STYLES — DEMID (INTEGRADO: NEON GMPOL + ADDONS + LEI MOBILE)
-   Versão final 03/10/2026 — substitui integralmente o anterior
+   Versão final 03/10/2026 (rev. 2 — moldura acompanha a rolagem)
    ══════════════════════════════════════════════════════════════ */
 
 /* ══ FUNDO GALÁXIA ══ */
@@ -274,7 +274,15 @@ body[data-demid-theme="neutro"]{--gn-a:#e8e8e8;--gn-a-rgb:232,232,232;--gn-hot:#
 
 body[data-demid-theme],body:not([data-demid-theme]){background:radial-gradient(circle at 50% -12%,rgba(var(--gn-a-rgb),.34),transparent 34%),linear-gradient(180deg,var(--gn-bg1) 0%,var(--gn-bg2) 46%,var(--gn-bgdeep) 100%)!important;}
 body[data-demid-theme]::before,body:not([data-demid-theme])::before{background-color:transparent!important;background-image:var(--gn-nebula),radial-gradient(circle at -6% 36%,var(--gn-planet) 0 80px,rgba(var(--gn-a-rgb),.16) 81px 112px,transparent 114px),var(--gn-stars)!important;background-size:100% 100%!important;opacity:.95!important;}
-body[data-demid-theme]::after,body:not([data-demid-theme])::after{display:block!important;background:none!important;content:'';position:fixed;inset:6px;pointer-events:none;z-index:1200;border:1px solid rgba(var(--gn-a-rgb),.30);box-shadow:0 0 18px rgba(var(--gn-a-rgb),.22),inset 0 0 22px rgba(var(--gn-a-rgb),.10);
+
+/* MOLDURA DE COCKPIT — ABSOLUTA NO DOCUMENTO INTEIRO:
+   acompanha a rolagem em qualquer navegador mobile (nunca descola) */
+body[data-demid-theme]::after,body:not([data-demid-theme])::after{
+ display:block!important;background:none!important;
+ content:'';position:absolute!important;top:4px!important;left:4px!important;right:4px!important;bottom:4px!important;
+ height:auto!important;width:auto!important;pointer-events:none;z-index:1200;
+ border:1px solid rgba(var(--gn-a-rgb),.30);
+ box-shadow:0 0 18px rgba(var(--gn-a-rgb),.22),inset 0 0 22px rgba(var(--gn-a-rgb),.10);
  background-image:linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a)),linear-gradient(var(--gn-a),var(--gn-a))!important;
  background-repeat:no-repeat!important;
  background-position:left top,left top,right top,right top,left bottom,left bottom,right bottom,right bottom!important;
@@ -302,7 +310,6 @@ body:not([data-demid-theme]) .cargo-badge,body:not([data-demid-theme]) .status-c
 body:not([data-demid-theme]) .ban-badge,body:not([data-demid-theme]) .notif-pill,body:not([data-demid-theme]) .u-avatar,
 body:not([data-demid-theme]) .ban-container,body:not([data-demid-theme]) .ban-timer-wrap,body:not([data-demid-theme]) .cargo-notif{animation:none!important;}
 
-/* Superfícies neon (SEM .tbl-wrap — ela precisa rolar) */
 body[data-demid-theme] .card,body[data-demid-theme] .login-card,body[data-demid-theme] .oc-wrap,
 body[data-demid-theme] .stat-box,body[data-demid-theme] .empty,body[data-demid-theme] .hint-box,
 body[data-demid-theme] .dep-box,body[data-demid-theme] .ponto-agente-block,body[data-demid-theme] .recruitment-hero,
@@ -313,7 +320,6 @@ body:not([data-demid-theme]) .dep-box,body:not([data-demid-theme]) .ponto-agente
  background:linear-gradient(160deg,rgba(var(--gn-a-rgb),.10),rgba(6,4,12,.94) 55%)!important;
  border:1px solid rgba(var(--gn-a-rgb),.55)!important;border-radius:16px!important;
  box-shadow:0 0 18px rgba(var(--gn-a-rgb),.22),inset 0 0 22px rgba(var(--gn-a-rgb),.06)!important;}
-/* .tbl-wrap: neon MAS com scroll horizontal livre */
 body[data-demid-theme] .tbl-wrap,body:not([data-demid-theme]) .tbl-wrap{
  position:relative;
  background:linear-gradient(160deg,rgba(var(--gn-a-rgb),.10),rgba(6,4,12,.94) 55%)!important;
@@ -367,7 +373,6 @@ body:not([data-demid-theme]) .dep-box::after,body:not([data-demid-theme]) .ponto
  background:linear-gradient(90deg,transparent,rgba(var(--gn-a-rgb),.65),transparent) top 0 left 0/100% 2px no-repeat!important;
  filter:drop-shadow(0 0 6px rgba(var(--gn-a-rgb),.7));}
 
-/* Topbar OPACA (nada vaza por trás) */
 body[data-demid-theme] .topbar,body:not([data-demid-theme]) .topbar{
  background-color:rgba(6,4,12,.98)!important;
  background-image:linear-gradient(180deg,rgba(var(--gn-a-rgb),.16),rgba(var(--gn-a-rgb),.02))!important;
@@ -432,27 +437,19 @@ body #s-panel::before{left:10px;content:'DEMID // SISTEMA CENTRAL';}
 body #s-panel::after{right:10px;content:'ACESSO MONITORADO // USO INTERNO';transform:translateY(-50%) rotate(180deg);}
 @media (max-width:1000px){body #s-panel::before,body #s-panel::after{display:none;}}
 
-/* ══════════════════════════════════════════════════════════════
-   LEI MOBILE — NADA NUNCA CORTA
-   ══════════════════════════════════════════════════════════════ */
+/* ══ LEI MOBILE — NADA NUNCA CORTA ══ */
 @media (max-width:900px){
-  /* Cards viram área rolável horizontal: tabela larga rola, nada some */
   body[data-demid-theme] .card,body[data-demid-theme] .oc-wrap,body[data-demid-theme] .dep-box,
   body[data-demid-theme] .hint-box,body[data-demid-theme] .ponto-agente-block,
   body:not([data-demid-theme]) .card,body:not([data-demid-theme]) .oc-wrap,body:not([data-demid-theme]) .dep-box,
   body:not([data-demid-theme]) .hint-box,body:not([data-demid-theme]) .ponto-agente-block{
     overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch!important;}
-  /* Tabelas: largura real p/ rolar dentro do wrap, nunca esmagar */
   .tbl-wrap .tbl{width:max-content!important;min-width:100%!important;}
-  /* Nada estoura a viewport */
   img,canvas,video,select,input,textarea,table{max-width:100%!important;}
   .btn,.cargo-badge,.status-chip,.tipo-badge{max-width:100%;}
   .oc-actions .btn,.ad-rel-actions .btn{flex:0 1 auto;white-space:normal!important;}
-  /* Badge de cargo sem cortar no meio: quebra limpa */
   .cargo-badge{max-width:34vw!important;overflow:hidden;text-overflow:ellipsis;}
-  /* Grids estatísticos: 2 colunas no celular */
   .g3{grid-template-columns:repeat(2,1fr)!important;}
-  /* Botões de ação em tabela: empilham e cabem */
   .tbl td .btn,.tbl td button{white-space:normal!important;}
 }
 @media (max-width:400px){
@@ -503,4 +500,4 @@ body #s-panel::after{right:10px;content:'ACESSO MONITORADO // USO INTERNO';trans
  body:not([data-demid-theme]) .card::before,body:not([data-demid-theme]) .login-card::before,body:not([data-demid-theme]) .oc-wrap::before,
  body:not([data-demid-theme]) .stat-box::before,body:not([data-demid-theme]) .empty::before,body:not([data-demid-theme]) .hint-box::before,
  body:not([data-demid-theme]) .dep-box::before,body:not([data-demid-theme]) .ponto-agente-block::before,body:not([data-demid-theme]) .recruitment-hero::before{animation:none!important;}
-                    }
+}
