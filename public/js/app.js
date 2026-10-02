@@ -238,13 +238,13 @@ function showPanel(){document.body.dataset.demidTheme=localStorage.getItem('demi
 
 function tabDefs(c){
   const p=CARGO_PERM[c]||0;
-  const base=[{label:'▸ INÍCIO',key:'home',notif:false},{label:'▸ INTRODUÇÃO',key:'intro',notif:false},{label:'▸ ESTUDOS',key:'estudos',notif:false}];
+  const base=[{label:'▸ INÍCIO',key:'home',notif:false},{label:'▸ INTRODUÇÃO',key:'intro',notif:false}];
   const common=[
-    {label:'▸ RELATÓRIO DE REUNIÃO',key:'registrar',notif:false},
+
     {label:'▸ MEUS RELATÓRIOS',key:'myocs',notif:false},
     {label:'▸ ADVERTÊNCIAS',key:'puns',notif:false},
     {label:'▸ PONTO',key:'pontos',notif:false},
-    {label:'▸ PROVAS',key:'provas',notif:false},
+
     {label:'▸ CHAT',key:'chat',notif:true},
     {label:'▸ ROLETA',key:'roleta',notif:false},
     {label:'▸ MEU VIP',key:'meuVip',notif:false},
@@ -252,15 +252,15 @@ function tabDefs(c){
     {label:'▸ HALL DA FAMA',key:'hall',notif:false},
     {label:'▸ VIPS',key:'vips',notif:false},
     {label:'▸ TEMAS DISPONÍVEIS',key:'temas',notif:false},
-    {label:'▸ PRISÕES',key:'prisoes',notif:false},
-    {label:'▸ RECRUTAMENTO',key:'recrutamento',notif:false}
+
+
   ];
-  const avaliacao=p>=5?[{label:'▸ ANALISAR RECRUTAMENTO',key:'analisarRecrutamento',notif:true},{label:'▸ APLICAR FALTA',key:'faltas',notif:false},{label:'▸ CARREIRA',key:'carreira',notif:false}]:[];
+  const avaliacao=p>=5?[{label:'▸ APLICAR FALTA',key:'faltas',notif:false},{label:'▸ CARREIRA',key:'carreira',notif:false}]:[];
   return[...base,...common,...avaliacao,
     {label:'▸ RELATÓRIOS PENDENTES',key:'ocs',notif:true},
     {label:'▸ RELATÓRIO GERAL',key:'hist',notif:false},
     {label:'▸ USUÁRIOS',key:'users',notif:false},
-    {label:'▸ ANÁLISE PROVAS',key:'aprovas',notif:true},
+
     {label:'▸ AUDITORIA',key:'audit',notif:false}
   ];
 }
@@ -364,7 +364,7 @@ ASS - (Agressão)
 
 DOP - (Desobediência a ordem policial)
 AAC - (Apologia ao crime)
-LDD - lavagem de dinheiro 
+LDD - lavagem de dinheiro
 MP - (Multas pendentes)
 DDV - (Desmanche de veículos ilegais)
 IDP - (invasão de propriedade)
@@ -381,19 +381,19 @@ ODSF - (obtenção de $ sujo/falso
 *(Crime de 4 estrelas ⭐⭐⭐⭐)*
 
 DSCT - (Desacato)
-Homicídio 
+Homicídio
 
 *(Crime de 5 estrelas⭐⭐⭐⭐⭐)*
 
 Suborno
-Corrupção 
+Corrupção
 Estelionato
 ADA - (Abuso de autoridade)
-RDVE - Roubo de veículo emergencial 
+RDVE - Roubo de veículo emergencial
 
 *(Crime de 6⭐⭐⭐⭐⭐⭐)*
 
-Sequestro 
+Sequestro
 Racismo
 Estupro
 DPOS - (discriminação por orientação sexual)
