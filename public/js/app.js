@@ -122,8 +122,9 @@ function handleSocketMessage(data){
       if(me&&payload.userLogin===me.user)toast(payload.status==='aprovado'?'✅ Seu recrutamento foi aprovado!':'❌ Seu recrutamento foi recusado.','i',8000);
       break;
     case 'USERS_UPDATED':
-      if(me){const mu=(payload||[]).find(u=>u.user===me.user);if(mu){me={...me,cargo:mu.cargo,nome:mu.nome,ativo:mu.ativo,girosBonus:(typeof mu.girosBonus==='number'?mu.girosBonus:0),ultimoGiroRoleta:mu.ultimoGiroRoleta||null,vip:mu.vip===true,vipExpiresAt:mu.vipExpiresAt||null,recado:mu.recado||'',foto:mu.foto||'',medalhas:Array.isArray(mu.medalhas)?mu.medalhas:[],horasExtrasAjustadas:mu.horasExtrasAjustadas||0,horasDevidasAjustadas:mu.horasDevidasAjustadas||0};saveSession();const badge=document.getElementById('tb-badge');if(badge){badge.className='cargo-badge '+(CARGO_BADGE_CLASS[me.cargo]||'');badge.textContent=CARGO_LABEL[me.cargo]||me.cargo;}}}
-      if(activeTab===getTabIdx('users')||activeTab===getTabIdx('pontos')||activeTab===getTabIdx('meuVip')||activeTab===getTabIdx('vips'))renderTabSafe(activeTab);
+      if(Array.isArray(payload))STATE.users=payload;
+      if(me){const mu=(payload||[]).find(u=>u.user===me.user);if(mu){me={...me,cargo:mu.cargo,nome:mu.nome,ativo:mu.ativo,girosBonus:(typeof mu.girosBonus==='number'?mu.girosBonus:0),ultimoGiroRoleta:mu.ultimoGiroRoleta||null,vip:mu.vip===true,vipExpiresAt:mu.vipExpiresAt||null,recado:mu.recado||'',foto:mu.foto||'',medalhas:Array.isArray(mu.medalhas)?mu.medalhas:[],horasExtrasAjustadas:mu.horasExtrasAjustadas||0,horasDevidasAjustadas:mu.horasDevidasAjustadas||0,carteira:mu.carteira||null};saveSession();const badge=document.getElementById('tb-badge');if(badge){badge.className='cargo-badge '+(CARGO_BADGE_CLASS[me.cargo]||'');badge.textContent=CARGO_LABEL[me.cargo]||me.cargo;}}}
+      if(activeTab===getTabIdx('users')||activeTab===getTabIdx('pontos')||activeTab===getTabIdx('meuVip')||activeTab===getTabIdx('vips')||activeTab===getTabIdx('carteira'))renderTabSafe(activeTab);
       if(activeTab===getTabIdx('chat')){renderChatListaContatos();renderChatMensagens();}
       if(activeTab===getTabIdx('roleta'))renderTabSafe(activeTab);
       break;
@@ -238,7 +239,7 @@ function showPanel(){document.body.dataset.demidTheme=normalizarTemaDemid(localS
 
 function tabDefs(c){
   const p=CARGO_PERM[c]||0;
-  const base=[{label:'▸ INÍCIO',key:'home',notif:false},{label:'▸ INTRODUÇÃO',key:'intro',notif:false}];
+  const base=[{label:'▸ INÍCIO',key:'home',notif:false},{label:'▸ MINHA CARTEIRA',key:'carteira',notif:false}];
   const common=[
 
     {label:'▸ MEUS RELATÓRIOS',key:'myocs',notif:false},
@@ -298,7 +299,7 @@ function closeNavDrawer(){document.getElementById('nav-drawer')?.classList.remov
 
 function renderTab(idx){
   const defs=tabDefs(me.cargo);const def=defs[idx]||defs[0];
-  const views={home:vInicio,intro:vIntroducao,estudos:vEstudos,carreira:vCarreira,faltas:vFaltas,ocs:vOcAdmin,hist:vHistorico,registrar:vRegistrar,myocs:vOcEditorDiretor,puns:vPunicoes,users:vUsuarios,vips:vVips,temas:vTemas,meuVip:vMeuVip,contratarVip:vContratarVip,hall:vHall,prisoes:vPrisoes,recrutamento:vRecrutamento,analisarRecrutamento:vAnalisarRecrutamento,pontos:vPontos,provas:vProvas,aprovas:vAnaliseProvas,audit:vAuditoria,chat:vChat,roleta:vRoleta};
+  const views={home:vInicio,intro:vIntroducao,estudos:vEstudos,carreira:vCarreira,faltas:vFaltas,ocs:vOcAdmin,hist:vHistorico,registrar:vRegistrar,myocs:vOcEditorDiretor,puns:vPunicoes,users:vUsuarios,vips:vVips,temas:vTemas,carteira:vCarteira,meuVip:vMeuVip,contratarVip:vContratarVip,hall:vHall,prisoes:vPrisoes,recrutamento:vRecrutamento,analisarRecrutamento:vAnalisarRecrutamento,pontos:vPontos,provas:vProvas,aprovas:vAnaliseProvas,audit:vAuditoria,chat:vChat,roleta:vRoleta};
   const contentEl=document.getElementById('content');
   if(!menuPermitido(def.key)){contentEl.innerHTML=telaMenuBloqueado(def.key);return;}
   const fn=views[def.key]||vInicio;
@@ -1127,6 +1128,16 @@ function aplicarTemaDemid(id){
   id=normalizarTemaDemid(id);
   if(!vipAtivo()){toast('🌟 Apenas usuários VIP podem alterar o tema.','w');return;}
   document.body.dataset.demidTheme=id;localStorage.setItem('demid_theme',id);if(activeTab===getTabIdx('temas'))renderTab(activeTab);toast('Tema aplicado com sucesso.','s');
+}
+function statusCarteiraLabel(c){return c==='aprovada'?'ATIVO':c==='pendente'?'AGUARDANDO APROVAÇÃO':'NÃO EMITIDA';}
+async function solicitarMinhaCarteira(){try{const r=await API.solicitarCarteira(me.user);if(r.user){me={...me,carteira:r.user.carteira};saveSession();const ix=STATE.users.findIndex(u=>u.user===me.user);if(ix>=0)STATE.users[ix]=r.user;}toast('🪪 Carteira criada e enviada ao Master para aprovação.','s');renderTabSafe(activeTab);}catch(e){toast(e.message||'Não foi possível solicitar a carteira.','d');}}
+async function decidirCarteira(login,decisao){try{await API.decidirCarteira(login,decisao,me.user);toast(decisao==='aprovar'?'✅ Carteira aprovada.':'Carteira recusada.','s');}catch(e){toast(e.message||'Não foi possível decidir a carteira.','d');}}
+function vCarteira(){
+  const u=(STATE.users||[]).find(x=>x.user===me.user)||me, c=u.carteira||me.carteira||null, master=isMaster();
+  const card=c?`<div class="wallet-card"><div class="wallet-top"><span>GEMID</span><b>IDENTIFICAÇÃO OFICIAL</b><span class="wallet-status ${c.status}">${statusCarteiraLabel(c.status)}</span></div><div class="wallet-body"><div><small>NOME</small><strong>${escRec(u.nome||u.user)}</strong></div><div><small>CARGO</small><strong>${escRec(CARGO_LABEL[u.cargo]||u.cargo)}</strong></div><div><small>REGISTRO</small><strong>${escRec(c.registro)}</strong></div><div><small>VALIDAÇÃO</small><strong>${c.status==='aprovada'?'DIRETORIA DEMID':'PENDENTE DO MASTER'}</strong></div></div><div class="wallet-footer">${c.status==='aprovada'?'Carteira oficial validada pela Diretoria DEMID.':'Solicitação enviada. Peça para o Master aprovar sua carteira.'}</div></div>`:`<div class="card wallet-empty"><div class="wallet-icon">🪪</div><h2>Carteira oficial DEMID</h2><p>Solicite sua identificação oficial. O sistema criará um registro único GEMID e enviará a carteira para aprovação do Master.</p><button class="btn btn-primary" onclick="solicitarMinhaCarteira()">▸ SOLICITAR CARTEIRA</button></div>`;
+  const pendentes=master?(STATE.users||[]).filter(x=>x.carteira?.status==='pendente'):[];
+  const aprovacao=master?`<div class="stitle" style="margin-top:24px;">▸ APROVAÇÕES PENDENTES</div><div class="card">${pendentes.length?pendentes.map(x=>`<div class="wallet-request"><div><b>${escRec(x.nome)}</b><span>${escRec(x.carteira.registro)} • ${escRec(CARGO_LABEL[x.cargo]||x.cargo)}</span></div><div><button class="btn btn-success btn-sm" onclick="decidirCarteira('${escRec(x.user)}','aprovar')">APROVAR</button> <button class="btn btn-danger btn-sm" onclick="decidirCarteira('${escRec(x.user)}','recusar')">RECUSAR</button></div></div>`).join(''):'<div class="hint">Nenhuma carteira aguardando aprovação.</div>'}</div>`:'';
+  return '<div class="stitle">▸ MINHA CARTEIRA</div>'+card+aprovacao;
 }
 function vTemas(){
   const atual=normalizarTemaDemid(localStorage.getItem('demid_theme'));
