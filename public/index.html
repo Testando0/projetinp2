@@ -567,12 +567,13 @@
   <script>
   /* ══════════════════════════════════════════════════════════════
      ADDONS DEMID — CPF/RG NA CARTEIRA · ZAP VIP ("CHAMAR EU") ·
-     REGISTRAR RELATÓRIO — auto-contido, não altera o sistema.
-     Persistência local por usuário (localStorage).
+     RELATÓRIOS COMO ITEM DE MENU (abas + menu lateral ☰)
+     Auto-contido: não altera nenhuma função original do sistema.
      ══════════════════════════════════════════════════════════════ */
   (function(){
   'use strict';
   var ADK='demid_addons_';
+  var AD_REL_ACTIVE=false;
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function curUser(){
     try{
@@ -592,8 +593,7 @@
   function save(d){try{localStorage.setItem(ADK+curUser(),JSON.stringify(d));}catch(e){}}
   function isVip(){try{return (typeof window.vipAtivo==='function')?!!window.vipAtivo():true;}catch(e){return true;}}
   function T(m,t){try{if(typeof window.toast==='function')window.toast(m,t||'s');}catch(e){}}
-  function openM(id){try{if(typeof window.openModal==='function')window.openModal(id);}catch(e){var m=document.getElementById(id);if(m)m.classList.add('open');}}
-  function closeM(id){try{if(typeof window.closeModal==='function')window.closeModal(id);}catch(e){var m=document.getElementById(id);if(m)m.classList.remove('open');}}
+  function closeDrawer(){try{if(typeof window.closeNavDrawer==='function')window.closeNavDrawer();}catch(e){}}
   function onlyD(v){return String(v||'').replace(/\D/g,'');}
   function maskCPF(v){v=onlyD(v).slice(0,11);
     if(v.length>9)return v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
@@ -661,7 +661,7 @@
     document.getElementById('ad-zap-call').style.display=(vip&&d.zap)?'inline-flex':'none';
   }
 
-  /* ── CPF/RG exibidos na carteira oficial ── */
+  /* ── CPF/RG na carteira oficial ── */
   function walletDocsHTML(d){
     return '<div class="ad-doc-cell"><small>CPF</small><strong>'+esc(d&&d.cpf?d.cpf:'—')+'</strong></div>'+
            '<div class="ad-doc-cell"><small>RG</small><strong>'+esc(d&&d.rg?d.rg:'—')+'</strong></div>';
@@ -685,33 +685,10 @@
     injectWallet();
   }
 
-  /* ── Registrar Relatório (modal + botão flutuante) ── */
-  function relModalHTML(){
-    return '<div id="m-relatorio" class="modal-overlay">'+
-      '<div class="modal">'+
-        '<div class="modal-h"><h3>▸ REGISTRAR RELATÓRIO</h3><button class="modal-close" id="rl-close" type="button">&times;</button></div>'+
-        '<div class="modal-b">'+
-          '<div class="g2">'+
-            '<div class="fg"><label>Tipo</label><select id="rl-tipo"><option>Ocorrência</option><option>Serviço</option><option>Patrulha</option><option>Imprensa</option><option>Outro</option></select></div>'+
-            '<div class="fg"><label>Título</label><input id="rl-titulo" placeholder="Resumo do relatório" autocomplete="off"></div>'+
-          '</div>'+
-          '<div class="fg"><label>Descrição completa</label><textarea id="rl-texto" placeholder="Descreva fatos, horários, locais e envolvidos…"></textarea></div>'+
-          '<div class="stitle" style="margin-top:16px">▸ RELATÓRIOS REGISTRADOS</div>'+
-          '<div id="rl-lista"></div>'+
-        '</div>'+
-        '<div class="modal-f">'+
-          '<button class="btn btn-ghost btn-sm" id="rl-cancel" type="button">FECHAR</button>'+
-          '<button class="btn btn-primary btn-sm" id="rl-save" type="button">📄 REGISTRAR RELATÓRIO</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-    '<button id="ad-fab" type="button" title="Registrar Relatório" aria-label="Registrar Relatório">📄</button>';
-  }
-  function renderRel(){
-    var box=document.getElementById('rl-lista');if(!box)return;
+  /* ── RELATÓRIOS: item de menu (abas + menu lateral) ── */
+  function relViewHTML(){
     var d=load();var rel=(d.relatorios||[]).slice().sort(function(a,b){return b.ts-a.ts;});
-    if(!rel.length){box.innerHTML='<div class="empty" style="padding:26px 14px"><div class="empty-ico">📄</div><p>Nenhum relatório registrado ainda.</p></div>';return;}
-    box.innerHTML=rel.map(function(r){
+    var lista=rel.length?rel.map(function(r){
       return '<div class="ad-rel-item" data-id="'+r.id+'">'+
         '<div class="ad-rel-head"><b>'+esc(r.titulo)+'</b><span class="tipo-badge tipo-oc">'+esc(r.tipo)+'</span></div>'+
         '<div class="ad-rel-meta">'+new Date(r.ts).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})+' · '+esc(r.autor||curUser())+'</div>'+
@@ -720,28 +697,85 @@
           '<button type="button" class="btn btn-ghost btn-xs" data-act="copy">📋 COPIAR</button>'+
           '<button type="button" class="btn btn-danger btn-xs" data-act="del">🗑 EXCLUIR</button>'+
         '</div></div>';
-    }).join('');
+    }).join(''):'<div class="empty"><div class="empty-ico">📄</div><p>Nenhum relatório registrado ainda.</p></div>';
+    return '<div class="stitle">▸ REGISTRAR RELATÓRIO</div>'+
+      '<div class="card c-none">'+
+        '<div class="g2">'+
+          '<div class="fg"><label>Tipo</label><select id="rl-tipo"><option>Ocorrência</option><option>Serviço</option><option>Patrulha</option><option>Imprensa</option><option>Outro</option></select></div>'+
+          '<div class="fg"><label>Título</label><input id="rl-titulo" placeholder="Resumo do relatório" autocomplete="off"></div>'+
+        '</div>'+
+        '<div class="fg"><label>Descrição completa</label><textarea id="rl-texto" placeholder="Descreva fatos, horários, locais e envolvidos…"></textarea></div>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">'+
+          '<button type="button" class="btn btn-primary btn-sm" id="rl-save">📄 REGISTRAR RELATÓRIO</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="stitle">▸ RELATÓRIOS REGISTRADOS ('+rel.length+')</div>'+lista;
   }
-  function injectRel(){
-    if(document.getElementById('m-relatorio'))return;
-    document.body.insertAdjacentHTML('beforeend',relModalHTML());
-    document.getElementById('ad-fab').addEventListener('click',function(){renderRel();openM('m-relatorio');});
-    document.getElementById('rl-close').addEventListener('click',function(){closeM('m-relatorio');});
-    document.getElementById('rl-cancel').addEventListener('click',function(){closeM('m-relatorio');});
-    document.getElementById('rl-save').addEventListener('click',function(){
+  function bindRelView(){
+    var s=document.getElementById('rl-save');
+    if(s)s.addEventListener('click',function(){
       var tipo=document.getElementById('rl-tipo').value;
       var titulo=document.getElementById('rl-titulo').value.trim();
       var texto=document.getElementById('rl-texto').value.trim();
       if(!titulo||!texto){T('Preencha título e descrição do relatório.','w');return;}
       var d=load();d.relatorios=d.relatorios||[];
       d.relatorios.push({id:Date.now(),ts:Date.now(),tipo:tipo,titulo:titulo,texto:texto,autor:curUser()});
-      save(d);
-      document.getElementById('rl-titulo').value='';document.getElementById('rl-texto').value='';
-      renderRel();T('Relatório registrado com sucesso.','s');
+      save(d);renderRelView();T('Relatório registrado com sucesso.','s');
     });
-    document.getElementById('rl-lista').addEventListener('click',function(ev){
-      var btn=ev.target.closest?ev.target.closest('button[data-act]'):null;if(!btn)return;
-      var item=btn.closest('.ad-rel-item');var id=+item.getAttribute('data-id');
+  }
+  function renderRelView(){
+    var c=document.getElementById('content');if(!c)return;
+    c.innerHTML=relViewHTML();
+    bindRelView();
+  }
+  function setRelActive(on){
+    var t=document.getElementById('ad-tab-rel'),n=document.getElementById('ad-nav-rel');
+    if(on){
+      document.querySelectorAll('#tabs .tab').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('#nav-drawer .nav-drawer-item').forEach(function(x){x.classList.remove('active');});
+      if(t)t.classList.add('active');
+      if(n)n.classList.add('active');
+    }else{
+      if(t)t.classList.remove('active');
+      if(n)n.classList.remove('active');
+    }
+  }
+  function openRelTab(){
+    AD_REL_ACTIVE=true;
+    setRelActive(true);
+    closeDrawer();
+    renderRelView();
+  }
+  function injectMenu(){
+    var tabs=document.getElementById('tabs');
+    if(tabs&&!document.getElementById('ad-tab-rel')){
+      var t=document.createElement('div');
+      t.className='tab';t.id='ad-tab-rel';t.textContent='📄 RELATÓRIOS';
+      t.addEventListener('click',openRelTab);
+      tabs.appendChild(t);
+    }
+    var nd=document.getElementById('nav-drawer');
+    if(nd&&!document.getElementById('ad-nav-rel')){
+      var n=document.createElement('div');
+      n.className='nav-drawer-item';n.id='ad-nav-rel';
+      n.innerHTML='<span>📄 RELATÓRIOS</span>';
+      n.addEventListener('click',openRelTab);
+      nd.appendChild(n);
+    }
+    if(AD_REL_ACTIVE){
+      setRelActive(true);
+      if(!document.getElementById('rl-titulo'))renderRelView();
+    }
+  }
+
+  /* ── ações copiar/excluir dentro da tela de relatórios ── */
+  function bindContentDelegate(){
+    var c=document.getElementById('content');if(!c)return;
+    c.addEventListener('click',function(ev){
+      var btn=ev.target&&ev.target.closest?ev.target.closest('button[data-act]'):null;
+      if(!btn)return;
+      var item=btn.closest('.ad-rel-item');if(!item)return;
+      var id=+item.getAttribute('data-id');
       var d=load();d.relatorios=d.relatorios||[];
       var r=d.relatorios.filter(function(x){return x.id===id;})[0];
       if(!r)return;
@@ -751,15 +785,21 @@
       }else{
         if(!confirm('Excluir este relatório?'))return;
         d.relatorios=d.relatorios.filter(function(x){return x.id!==id;});
-        save(d);renderRel();T('Relatório excluído.','w');
+        save(d);renderRelView();T('Relatório excluído.','w');
       }
     });
   }
 
+  /* ── clique em aba/item real desmarca a tela de relatórios ── */
+  document.addEventListener('click',function(e){
+    var el=e.target&&e.target.closest?e.target.closest('#tabs .tab, #nav-drawer .nav-drawer-item'):null;
+    if(el&&!el.closest('#ad-tab-rel,#ad-nav-rel')){AD_REL_ACTIVE=false;setRelActive(false);}
+  },true);
+
   function injectAll(){
     injectProfile();
     injectWallet();
-    injectRel();
+    injectMenu();
     var mp=document.getElementById('m-perfil');
     if(mp&&mp.classList.contains('open'))syncProfile();
   }
@@ -767,11 +807,12 @@
   function queue(){if(pend)return;pend=true;requestAnimationFrame(function(){pend=false;injectAll();});}
   function start(){
     injectAll();
+    bindContentDelegate();
     new MutationObserver(queue).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-  window.adAbrirRelatorio=function(){renderRel();openM('m-relatorio');};
+  window.adAbrirRelatorio=openRelTab;
   })();
   </script>
 </body>
-            </html>
+                </html>
