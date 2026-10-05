@@ -1,5 +1,5 @@
 // DEMID Service Worker v1.0
-const CACHE_NAME = 'demid-cache-v17';
+const CACHE_NAME = 'demid-cache-v18';
 const OFFLINE_URL = '/';
 
 // Recursos críticos para cache offline
@@ -10,7 +10,8 @@ const PRECACHE_RESOURCES = [
   '/css/extra.css',
   '/js/api.js',
   '/js/app.js',
-  '/logo.png'
+  '/logo.png',
+  '/manifest.json'
 ];
 
 // Instalação: pré-cache dos recursos
