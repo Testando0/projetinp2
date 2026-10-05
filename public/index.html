@@ -340,6 +340,7 @@
         <div id="tb-badge" class="cargo-badge">CARGO</div>
       </div>
       <div class="topbar-r">
+        <button id="install-app-btn" class="install-app-btn" type="button" hidden aria-label="Instalar aplicativo DEMID">⬇ BAIXAR APP</button>
         <div id="ws-pill" class="ws-pill">🔴</div>
         <div id="notif-pill" class="notif-pill">
           <div class="notif-dot"></div>
@@ -814,5 +815,46 @@
   window.adAbrirRelatorio=openRelTab;
   })();
   </script>
+  <script>
+    /* ══ INSTALAÇÃO PWA DEMID ══
+       Manifest + Service Worker geram a instalação do app pelo navegador. */
+    (function(){
+      var deferredPrompt = null;
+      var installBtn = null;
+      function isInstalled(){
+        return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches
+          || window.navigator.standalone === true
+          || document.referrer.indexOf('android-app://') === 0;
+      }
+      function hideInstall(){ if(installBtn){ installBtn.hidden=true; installBtn.setAttribute('aria-hidden','true'); } }
+      function showInstall(){ if(!isInstalled() && installBtn){ installBtn.hidden=false; installBtn.removeAttribute('aria-hidden'); } }
+      function helpInstall(){
+        window.alert('Para instalar o DEMID: abra o menu do navegador e toque em “Adicionar à tela inicial” ou “Instalar aplicativo”.');
+      }
+      function setup(){
+        installBtn=document.getElementById('install-app-btn');
+        if(!installBtn)return;
+        if(isInstalled()){ hideInstall(); return; }
+        showInstall();
+        installBtn.addEventListener('click', async function(){
+          if(!deferredPrompt){ helpInstall(); return; }
+          deferredPrompt.prompt();
+          var result=await deferredPrompt.userChoice;
+          if(result&&result.outcome==='accepted')hideInstall();
+          deferredPrompt=null;
+        });
+      }
+      window.addEventListener('beforeinstallprompt',function(event){
+        event.preventDefault();
+        deferredPrompt=event;
+        showInstall();
+      });
+      window.addEventListener('appinstalled',function(){ deferredPrompt=null; hideInstall(); });
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(err){ console.warn('[PWA] Service Worker:',err); });
+      }
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+    })();
+  </script>
 </body>
-                </html>
+          </html>
