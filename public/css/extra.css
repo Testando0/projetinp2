@@ -500,7 +500,4 @@ body #s-panel::after{right:10px;content:'ACESSO MONITORADO // USO INTERNO';trans
  body:not([data-demid-theme]) .card::before,body:not([data-demid-theme]) .login-card::before,body:not([data-demid-theme]) .oc-wrap::before,
  body:not([data-demid-theme]) .stat-box::before,body:not([data-demid-theme]) .empty::before,body:not([data-demid-theme]) .hint-box::before,
  body:not([data-demid-theme]) .dep-box::before,body:not([data-demid-theme]) .ponto-agente-block::before,body:not([data-demid-theme]) .recruitment-hero::before{animation:none!important;}
-}
-
-/* ══ BOTÃO DE INSTALAÇÃO DO APP DEMID ══ */
-.install-app-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:32px;padding:6px 10px;border:1px solid var(--accent,#a78bfa);border-radius:8px;background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(59,130,246,.18));color:var(--text,#fff);font:700 .64rem 'Orbitron',sans-serif;letter-spacing:.04em;cursor:pointer;white-space:nowrap;box-shadow:0 0 12px rgba(139,92,246,.2);transition:transform .16s,box-shadow .16s,background .16s}.install-app-btn:hover{transform:translateY(-1px);box-shadow:0 0 18px rgba(139,92,246,.42);background:linear-gradient(135deg,rgba(139,92,246,.42),rgba(59,130,246,.3))}.install-app-btn[hidden]{display:none!important}@media(max-width:560px){.install-app-btn{font-size:.55rem;padding:5px 7px;min-height:30px}.topbar-r{gap:5px}.topbar-user{max-width:72px;overflow:hidden;text-overflow:ellipsis}}
+   }
